@@ -1,0 +1,26 @@
+Package: MAPFX
+Title: MAssively Parallel Flow cytometry Xplorer (MAPFX): A Toolbox for
+        Analysing Data from the Massively-Parallel Cytometry
+        Experiments
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Hsiao-Chi", "Liao", , "hsiaochi.liao@student.unimelb.edu.au", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-9586-1246")),
+	person("Agus", "Salim", , role = c("ctb")))
+Description: This end-to-end toolbox for analysing data from the massively-parallel cytometry experiments carefully pre-processes the raw data in FCS format, and further imputes the ‘missing’ exploratory markers (Legend) in the wells without measurement. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting the normal-exponential convolution model. Secondly, unwanted technical variation such as well effects is removed by applying the log-normal model with plate, column, and row factors. Thirdly, imputation is done by using the informative backbone markers as predictors. Lastly, cluster analysis can be performed on both normalised backbone measurements and the completed dataset.
+Depends: R (>= 4.2.0)
+License: GPL-2
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: flowCore, Biobase, stringr, uwot, Rphenograph, igraph,
+        ggplot2, RColorBrewer, Rfast, ggrepel, ComplexHeatmap,
+        circlize, glmnetUtils, e1071, xgboost, foreach, doParallel,
+        parallel, pbapply, reshape, gtools, utils, stats
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2023-09-24 12:43:02 UTC; chelsea
+Author: Hsiao-Chi Liao [aut, cre] (<https://orcid.org/0000-0002-9586-1246>),
+  Agus Salim [ctb]
+Maintainer: Hsiao-Chi Liao <hsiaochi.liao@student.unimelb.edu.au>
