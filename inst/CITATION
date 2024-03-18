@@ -1,0 +1,35 @@
+bibentry(bibtype = "Article",
+         title = "MAssively-Parallel Flow cytometry Xplorer (MAPFX): A Toolbox for Analysing Data from the Massively-Parallel Cytometry Experiments",
+         author = c(person("Hsiao-Chi", "Liao"),
+		    person("Terence P.", "Speed"),
+		    person("Davis J.", "McCarthy"),
+		    person("Agus", "Salim")),
+	year = {2024},
+	doi = "https://doi.org/10.1101/2024.02.28.582452",
+	publisher = "Cold Spring Harbor Laboratory",
+	URL = "https://www.biorxiv.org/content/early/2024/03/03/2024.02.28.582452",
+	eprint = "https://www.biorxiv.org/content/early/2024/03/03/2024.02.28.582452.full.pdf",
+	journal = "bioRxiv")
+
+bibentry(bibtype= "Article",
+	title = "High-throughput single-cell quantification of hundreds of proteins using conventional flow cytometry and machine learning",
+	author = c(person("Etienne","Becht"), 
+		   person("Daniel","Tolstrup"), 
+		   person("Charles-Antoine","Dutertre"),
+		   person("Peter A.","Morawski"),
+		   person("Daniel J.","Campbell"),
+		   person("Florent","Ginhoux"), 
+		   person("Evan W.","Newell"), 
+		   person("Raphael","Gottardo"),
+		   person("Mark B.","Headley")),
+	year = {2021},
+	doi = "10.1126/sciadv.abg0505",
+	publisher = "American Association for the Advancement of Science's (AAAS)",
+	URL = "https://www.science.org/doi/abs/10.1126/sciadv.abg0505",
+	eprint = "https://www.science.org/doi/pdf/10.1126/sciadv.abg0505",
+	journal = "Science Advances")
+
+citation("infinityFlow")
+
+
+

@@ -1,0 +1,28 @@
+@article{mapfx,
+	author = {Hsiao-Chi Liao and Terence P. Speed and Davis J. McCarthy and Agus Salim},
+	title = {MAssively-Parallel Flow cytometry Xplorer (MAPFX): A Toolbox for Analysing Data from the Massively-Parallel Cytometry Experiments},
+	elocation-id = {2024.02.28.582452},
+	year = {2024},
+	doi = {10.1101/2024.02.28.582452},
+	publisher = {Cold Spring Harbor Laboratory},
+	abstract = {Massively-Parallel Cytometry (MPC) experiments allow cost-effective quantification of more than 200 surface proteins at single-cell resolution. The Infinity Flow (Inflow) analysis protocol was developed to measure highly informative protein {\textquoteright}backbone{\textquoteright} markers on all cells in all wells distributed across three 96-well plates, along with well-specific exploratory protein {\textquoteright}infinity{\textquoteright} markers. Backbone markers can be used to impute the infinity markers on cells in all other wells using machine learning methods. This protocol offers unprecedented opportunities for more comprehensive classification of cell types. However, some aspects of the protocol can be improved, including methods for background correction and removal of unwanted variation. Here, we propose MAPFX as an end-to-end toolbox that carefully pre-processes the raw data from MPC experiments, and further imputes the {\textquoteright}missing{\textquoteright} infinity markers in the wells without those measurements. Our pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors. The completed dataset can then be used for clustering and other statistical analyses. Unique features of our approach include performing background correction prior to imputation and removing unwanted variation from the data at the cell-level, while explicitly accounting for the potential association between biology and unwanted factors. We benchmark our pipeline against alternative pipelines and demonstrate that our approach is better at preserving biological signals, removing unwanted variation, and imputing unmeasured infinity markers.Competing Interest StatementThe authors have declared no competing interest.},
+	URL = {https://www.biorxiv.org/content/early/2024/03/03/2024.02.28.582452},
+	eprint = {https://www.biorxiv.org/content/early/2024/03/03/2024.02.28.582452.full.pdf},
+	journal = {bioRxiv}
+}
+
+
+@article{inflow,
+author = {Etienne Becht  and Daniel Tolstrup  and Charles-Antoine Dutertre  and Peter A. Morawski  and Daniel J. Campbell  and Florent Ginhoux  and Evan W. Newell  and Raphael Gottardo  and Mark B. Headley },
+title = {High-throughput single-cell quantification of hundreds of proteins using conventional flow cytometry and machine learning},
+journal = {Science Advances},
+volume = {7},
+number = {39},
+pages = {eabg0505},
+year = {2021},
+doi = {10.1126/sciadv.abg0505},
+URL = {https://www.science.org/doi/abs/10.1126/sciadv.abg0505},
+eprint = {https://www.science.org/doi/pdf/10.1126/sciadv.abg0505},
+abstract = {This study presents a novel method for low-cost cell surface proteomics using flow cytometry and machine learning. Modern immunologic research increasingly requires high-dimensional analyses to understand the complex milieu of cell types that comprise the tissue microenvironments of disease. To achieve this, we developed Infinity Flow combining hundreds of overlapping flow cytometry panels using machine learning to enable the simultaneous analysis of the coexpression patterns of hundreds of surface-expressed proteins across millions of individual cells. In this study, we demonstrate that this approach allows the comprehensive analysis of the cellular constituency of the steady-state murine lung and the identification of previously unknown cellular heterogeneity in the lungs of melanoma metastasis–bearing mice. We show that by using supervised machine learning, Infinity Flow enhances the accuracy and depth of clustering or dimensionality reduction algorithms. Infinity Flow is a highly scalable, low-cost, and accessible solution to single-cell proteomics in complex tissues.}
+}
+

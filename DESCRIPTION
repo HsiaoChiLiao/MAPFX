@@ -1,0 +1,24 @@
+Package: MAPFX
+Title: MAssively Parallel Flow cytometry Xplorer (MAPFX): A Toolbox for
+        Analysing Data from the Massively-Parallel Cytometry
+        Experiments
+Version: 0.99.0
+Authors@R:
+	c(person("Hsiao-Chi", "Liao", email = "chelsea.acad@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9586-1246")),
+	  person("Agus", "Salim", role = c("ctb")), person("infinityFlow", role = c("ctb")))
+Description: MAPFX is an end-to-end toolbox that pre-processes the raw data from MPC experiments (e.g., BioLegend's LEGENDScreen and BD Lyoplates assays), and further imputes the ‘missing’ infinity markers in the wells without those measurements. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors. The completed dataset can then be used for clustering and other statistical analyses. Additionally, MAPFX can be used to normalise data from FFC assays as well.
+Depends: R (>= 4.4.0)
+License: GPL-2
+Encoding: UTF-8
+RoxygenNote: 7.3.1
+Roxygen: list(markdown = TRUE)
+biocViews: Software, FlowCytometry, CellBasedAssays, SingleCell, Proteomics, Clustering
+Imports: flowCore, Biobase, stringr, uwot, iCellR, igraph,
+        ggplot2, RColorBrewer, Rfast, ggrepel, ComplexHeatmap,
+        circlize, glmnetUtils, e1071, xgboost, foreach, doParallel,
+        parallel, pbapply, reshape2, gtools, utils, stats, cowplot, methods, grDevices, graphics
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: no
+URL: https://github.com/HsiaoChiLiao/MAPFX
+BugReports: https://github.com/HsiaoChiLiao/MAPFX/issues
