@@ -222,7 +222,7 @@ Figures will be stored here, including **scatter plots** for comparing backgroun
 
 # THANK YOU
 
-Thanks for carrying out analyses with our `MAPFX` package. Please feel free to raise any issues and/or questions on our GitHub page and/or send them to [Hsiao-Chi](hsiaochi.liao@student.unimelb.edu.au).
+Thanks for carrying out analyses with our `MAPFX` package. Please feel free to raise any issues and/or questions on our GitHub page and/or send them to Hsiao-Chi [hsiaochi.liao@student.unimelb.edu.au](mailto:hsiaochi.liao@student.unimelb.edu.au).
 
 ## Information about the R session when this vignette was built
 
