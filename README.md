@@ -5,7 +5,7 @@
 
 # Introduction
 ## Analysing Data from MPC Experiments
-This package implemented an end-to-end toolbox for analysing raw data from MPC experiments. More details on the methodology can be found in @mapfx. The `MapfxMPC` function is designed for running through the whole pipeline. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors with machine learning models. Cluster analysis and visualisation with UMAP two-dimensional representations can then be carried out if desired. Users can set `MapfxMPC(..., impute=FALSE)` if the imputation is not needed. 
+This package implemented an end-to-end toolbox for analysing raw data from MPC experiments. More details on the methodology can be found in [the MAPFX paper](https://doi.org/10.1101/2024.02.28.582452). The `MapfxMPC` function is designed for running through the whole pipeline. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors with machine learning models. Cluster analysis and visualisation with UMAP two-dimensional representations can then be carried out if desired. Users can set `MapfxMPC(..., impute=FALSE)` if the imputation is not needed. 
 
 ## Analysing Data from the Fluorescence Flow Cytometry (FFC) Experiments
 For the protein intensities from FFC experiments, the function `MapfxFFC` is used to carry out normalisation steps which include background correction and removal of unwanted variation, and the function can further perform cluster analysis and visualisation with UMAP two-dimensional representations if specified.
@@ -103,7 +103,7 @@ library(cowplot)
 **Soon will be available from the Experiment Data Package - MapfxData.**\
 
 ### MPC
-This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [@inflow]. The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
+This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [Inflow](https://www.science.org/doi/10.1126/sciadv.abg0505). The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
 
 ### FFC
 This dataset contains 316,779 cells (sorted CD4+ and CD8+ T cells) from mice splenocytes that was downloaded from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023).
