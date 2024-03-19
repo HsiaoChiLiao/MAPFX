@@ -100,7 +100,7 @@ library(cowplot)
 ```
 
 ## The Example Datasets in the MapfxData Package
-**Soon will be available from the Experiment Data Package - MapfxData.**
+**Soon will be available from the Bioconductor Experiment Data Package - MapfxData.**
 
 ### MPC
 This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [Inflow](https://www.science.org/doi/10.1126/sciadv.abg0505). The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
