@@ -33,12 +33,12 @@ For the protein intensities from FFC experiments, the function `MapfxFFC` is use
 
 ## Notes on Metadata
 #### For MPC (the plate-based) Experiments
-When set `file_meta = "auto"` for `MapfxMPC`, the file identifier keyword (GUID) of the FCS files MUST contain the following information and in the specified format:
-Plate information: Plate1, Plate2, …, Plate9
-Well information: A1, A2, …, A12, B1, …, H1, …, H12
+When set `file_meta = "auto"` for `MapfxMPC`, the file identifier keyword (GUID) of the FCS files MUST contain the following information and in the specified format:<br>
+Plate information: Plate1, Plate2, …, Plate9<br>
+Well information: A1, A2, …, A12, B1, …, H1, …, H12<br>
 
-When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/FCS/meta/`.
-An example:
+When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/FCS/meta/`.<br>
+An example:<br>
 |  Filenam  |  Plate  |  Well  |  Column  |  Row  |  Well.lab  |
 |:---------:|:-------:|:------:|:--------:|:-----:|:----------:|
 |p1_a12.fcs |  Plate1 |   A12  |  Col.12  | Row.01|   P1_A12   |
@@ -49,7 +49,7 @@ Note that the "Filenam" column refers to the GUID (file name) of each FCS file i
 <br>
 
 #### For FFC Experiments from Different Batches
-Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/FCS/meta/`.
+Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/FCS/meta/`.<br>
 An example:
 |  Filenam  |  Batch  |
 |:---------:|:-------:|
@@ -211,13 +211,13 @@ help(MapfxFFC, package = "MAPFX")
 All the output will be stored in the `/Outpath/Output/`.
 
 ## Description of the output
-Three folders will be automatically generated in `/Outpath/Output/`.
-1. `intermediary`:
-Intermediary results will be saved in the `.rds` and `.RData` formats and will be stored here.
-2. `downstream`:
-Final results will be saved in the `.rds` format and will be stored here. The results include normalised backbone measurements (on both linear and log scale: `bkc.adj.bkb_linearScale_mt.rds` and `bkc.adj.bkb_logScale_mt.rds`), the completed dataset with imputed infinity (exploratory) markers (`predictions.Rds`), UMAP coordinates derived from both normalised backbones (`ClusterAnalysis_umap_#bkb.rds`) and the completed dataset (`ClusterAnalysis_ImpuMtd_umap_#bkb.#impuPE.rds`), and metadata (`fcs_metadata_df.rds`) for cells including cluster labels derived from both normalised backbones and the completed data matrix.
-3. `graph`:
-Figures will be stored here, including **scatter plots** for comparing background corrected and raw protein intensities for each protein marker, **heatmaps** for presenting the biological and unwanted effects in the data before and after removal of unwanted variation with *mapfx.norm*, **boxplots** (for imputations from multiple models) and **a boxplot and a histogram** (for imputations from a single model) of R-sq values for visualising the accuracy of imputed infinity (exploratory) markers, and **UMAP plots** for showing the cluster structure.
+Three folders will be automatically generated in `/Outpath/Output/`.<br>
+1. `intermediary`:<br>
+Intermediary results will be saved in the `.rds` and `.RData` formats and will be stored here.<br>
+2. `downstream`:<br>
+Final results will be saved in the `.rds` format and will be stored here. The results include normalised backbone measurements (on both linear and log scale: `bkc.adj.bkb_linearScale_mt.rds` and `bkc.adj.bkb_logScale_mt.rds`), the completed dataset with imputed infinity (exploratory) markers (`predictions.Rds`), UMAP coordinates derived from both normalised backbones (`ClusterAnalysis_umap_#bkb.rds`) and the completed dataset (`ClusterAnalysis_ImpuMtd_umap_#bkb.#impuPE.rds`), and metadata (`fcs_metadata_df.rds`) for cells including cluster labels derived from both normalised backbones and the completed data matrix.<br>
+3. `graph`:<br>
+Figures will be stored here, including **scatter plots** for comparing background corrected and raw protein intensities for each protein marker, **heatmaps** for presenting the biological and unwanted effects in the data before and after removal of unwanted variation with *mapfx.norm*, **boxplots** (for imputations from multiple models) and **a boxplot and a histogram** (for imputations from a single model) of R-sq values for visualising the accuracy of imputed infinity (exploratory) markers, and **UMAP plots** for showing the cluster structure.<br>
 
 
 # THANK YOU
