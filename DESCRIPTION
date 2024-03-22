@@ -8,7 +8,7 @@ Authors@R:
 	  person("Agus", "Salim", role = c("ctb")), person("infinityFlow", role = c("ctb")))
 Description: MAPFX is an end-to-end toolbox that pre-processes the raw data from MPC experiments (e.g., BioLegend's LEGENDScreen and BD Lyoplates assays), and further imputes the ‘missing’ infinity markers in the wells without those measurements. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors. The completed dataset can then be used for clustering and other statistical analyses. Additionally, MAPFX can be used to normalise data from FFC assays as well.
 Depends: R (>= 4.4.0)
-License: GPL-2
+License: GPL-2 + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
