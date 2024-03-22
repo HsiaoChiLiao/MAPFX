@@ -20,7 +20,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 ## Experimental and Computational Pipeline of the Data from the Massively-Parallel Cytometry (MPC) Experiments
-![](/Volumes/Transcend_4T/PhD_desktop/ProteinExpression/InFlow/Programming/package/2024/Vignette/graphs_vignettes/F1.exp_compu_pipeline.png){width=100%, height=100%}
+
+![](F1.exp_compu_pipeline.png)
 The experimental and the computational pipeline of the Inflow protocol [@inflow]: (A) Experimental pipeline. The single-cell samples are stained with backbone markers (backbone panel staining), then the stained samples are allocated to wells with one particular infinity marker (infinity panel staining), lastly, data can be acquired from the flow cytometry assay for each well. (B) Computational pipeline. The matrix of the normalised data showing that the backbone matrix (gray) contains values for every single-cell (row), but only block diagonal entries of the infinity matrix (yellow) have measurements. Imputation of the unmeasured infinity markers is done by using the backbone markers as predictors in regression models. Finally, the completed data matrix is obtained after imputation. The above figure is extracted from Figure 1 of the paper by @mapfx.
 
 ## Analysing Data from MPC Experiments
@@ -255,14 +256,14 @@ Figures will be stored here, including **scatter plots** for comparing backgroun
 ### Background Correction 
 This step works on both MPC and FFC data.
 
-![Figure 1](/Volumes/Transcend_4T/PhD_desktop/ProteinExpression/InFlow/Programming/package/2024/Vignette/graphs_vignettes/bkc.jpg){width=100%, height=100%}
+![Figure 1](bkc.jpg)
 
 The comparison of background corrected values (y-axis) and raw intensities (x-axis) for a backbone marker (left, blue) and an infinity marker (right, gold) with a 45 degree line representing x=y. Our approach aims to "calibrate" the raw protein intensities, especially the non-positive values, without distorting large values too much.
 
 ### Removal of unwanted (well/batch) variation
 This step works on both MPC and FFC data.
 
-![Figure 2](/Volumes/Transcend_4T/PhD_desktop/ProteinExpression/InFlow/Programming/package/2024/Vignette/graphs_vignettes/ruv_mpc.jpg){width=100%, height=100%}
+![Figure 2](ruv_mpc.jpg)
 
 A. Maximum likelihood estimates of the unwanted (left) and the biological (right) effects estimated from the pre-adjusted data. B. Maximum likelihood estimates of the unwanted (left) and the biological (right) effects estimated from the post-adjusted data using *mapfx.norm*. Orange represents positive effects, whereas blue indicates negative effects. The heatmaps show the existence of unwanted (well) effects and biological effects in the pre-adjusted data, and *mapfx.norm* managed to remove the unwanted (well) effects from the data while preserving biological variation. We can also use *mapfx.norm* to remove batch effect from FFC data.
 
@@ -270,14 +271,14 @@ A. Maximum likelihood estimates of the unwanted (left) and the biological (right
 ### Performance of imputation
 This step works on MPC data.
 
-![Figure 3](/Volumes/Transcend_4T/PhD_desktop/ProteinExpression/InFlow/Programming/package/2024/Vignette/graphs_vignettes/mpc/Rsq_boxplot_1model_500x800.jpeg){width=100%, height=100%}
+![Figure 3](Rsq_boxplot_1model_500x800.jpeg)
 
 The histogram and boxplot of the R-sq values of infinity markers. Higher R-sq values represent better performance of imputation.
 
 ### Cluster analysis
 This step works on both MPC and FFC data.
 
-![Figure 4](/Volumes/Transcend_4T/PhD_desktop/ProteinExpression/InFlow/Programming/package/2024/Vignette/graphs_vignettes/cluster.jpg){width=100%, height=100%}
+![Figure 4](cluster.jpg)
 
 In this example, we show the results from MPC data, the UMAP two dimensional representation of cells with clusters derived from the PhenoGraph algorithm using the *mapfx.norm* normalised backbone data only (left) and both the normalised backbone and the imputed infinity markers (right). Clusters are better refined when we derived them using the completed data matrix (right).
 
