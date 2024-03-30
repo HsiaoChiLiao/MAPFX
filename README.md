@@ -118,7 +118,10 @@ MAPFX::MapfxMPC()
 # usage
 # when impute = TRUE, randomly selecting 50% of the cells in each well for model training
 set.seed(123) 
-MapfxMPC(FCSpath = "/FCSpath/FCS/",
+MapfxMPC(runVignette = FALSE,
+         runVignette_meta = NULL,
+         runVignette_rawInten = NULL,
+         FCSpath = "/FCSpath/FCS/",
          Outpath = "/Outpath/Output/",
          file_meta = "auto",
          bkb.v = c("FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -157,7 +160,10 @@ All the output will be stored in the `/Outpath/Output/`.
 For users who would like to perform the following steps: background correction, removal of unwanted variation (well effects), and cluster analysis using backbones only.
 ``` r
 # usage
-MapfxMPC(FCSpath="/FCSpath/FCS/",
+MapfxMPC(runVignette = FALSE,
+         runVignette_meta = NULL,
+         runVignette_rawInten = NULL,
+         FCSpath="/FCSpath/FCS/",
          Outpath="/Outpath/Output/",
          file_meta="auto",
          bkb.v = c("FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -192,7 +198,10 @@ For users who would like to perform the following steps: background correction, 
 MAPFX::MapfxFFC()
 ```         
 ``` r
-MapfxFFC(FCSpath = "/FCSpath/FCS/",
+MapfxFFC(runVignette = FALSE,
+         runVignette_meta = NULL,
+         runVignette_rawInten = NULL,
+         FCSpath = "/FCSpath/FCS/",
          Outpath = "/Outpath/Output/",
          file_meta = "auto",
          protein.v = c("CD3","CD4","CD8","CD45"),
