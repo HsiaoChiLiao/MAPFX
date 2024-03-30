@@ -131,10 +131,10 @@ library(cowplot)
 
 ## Using the Example Datasets in MAPFX Package for this Vignette
 ### MPC
-This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) provided by Etienne Becht (Nov 2020). The raw protein intensities and the corresponding metadata information were saved in the objects `ord.fcs.raw.mt_mpc` and `ord.fcs.raw.meta.df.out_mpc` which were generated from 266 .FCS files from 266 wells with 50 cells in each file.
+This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) provided by Etienne Becht (Nov 2020). The raw protein intensities and the corresponding metadata were saved in the objects `ord.fcs.raw.mt_mpc` and `ord.fcs.raw.meta.df.out_mpc` which were generated from 266 .FCS files from 266 wells with 50 cells in each file.
 
 ### FFC
-This dataset contains 50 cells (sorted CD4+ and CD8+ T cells) in each .FCS files from mice splenocytes that was down-sampled from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023). The raw protein intensities and the corresponding metadata information were saved in the objects `ord.fcs.raw.mt_ffc` and `ord.fcs.raw.meta.df.out_ffc`.
+This dataset contains 50 cells (sorted CD4+ and CD8+ T cells) in each .FCS files from mice splenocytes that was down-sampled from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023). The raw protein intensities and the corresponding metadata were saved in the objects `ord.fcs.raw.mt_ffc` and `ord.fcs.raw.meta.df.out_ffc`.
 
 ## `MapfxMPC(..., impute=TRUE)` - analysing data from MPC experiments
 For users who would like to perform all of the following steps: background correction, removal of unwanted variation (well effects), **imputation**, and cluster analysis.
