@@ -2,6 +2,9 @@
 #'
 #' @description This function is an end-to-end toolbox for analysing single-cell protein intensity data from the Massively-Parallel Cytometry (MPC) Experiments in FCS format. The functions include data normalisation, imputation (using backbone markers), and cluster analysis.
 #'
+#' @param runVignette logical; if FALSE (default), specify a path to `FCSpath` argument; TRUE for running Vignette using built-in data. 
+#' @param runVignette_meta the argument for the built-in metadata when running Vignette; NULL (default).
+#' @param runVignette_rawInten the argument for the built-in raw intensities when running Vignette; NULL (default).
 #' @param FCSpath path to the input directory where `filename_meta.csv` and FCS files are stored (one file per well). `filename_meta.csv` should be saved under `FCSpath/FCS/meta/` and FCS files should be saved under `FCSpath/FCS/fcs/` (See Vignette for details.)
 #' @param Outpath path to the output directory where intermediate results and final results will be stored.
 #' @param file_meta if the file names of the FCS files are in the specified format, set `file_meta = "auto"`; otherwise set `file_meta="usr"` and provide a `filename_meta.csv` file in `FCSpath/FCS/meta/`.
@@ -31,6 +34,8 @@
 #'
 #' @author Hsiao-Chi Liao, Agus Salim, and InfinityFlow (Becht et. al, 2021)
 #'
+#' @importFrom utils data
+#'
 #' @export
 #' @return Normalised backbone measurements and imputed well-specific markers. Cluster analysis for both normalised backbones and the completed dataset. Graphs will be provided if specified.
 #' @examples
@@ -39,7 +44,10 @@
 #' MapfxMPC()
 #'
 #' @usage
-#' MapfxMPC(FCSpath,
+#' MapfxMPC(runVignette = FALSE,
+#'          runVignette_meta = NULL,
+#'          runVignette_rawInten = NULL,
+#'          FCSpath,
 #'          Outpath,
 #'          file_meta = "auto",
 #'          bkb.v,
@@ -65,6 +73,9 @@
 #' 
 MapfxMPC <-
 function(
+    runVignette = FALSE,
+    runVignette_meta = NULL,
+    runVignette_rawInten = NULL,
     FCSpath = NULL,
     Outpath = NULL,
     file_meta = "auto",
@@ -89,7 +100,104 @@ function(
     cluster.analysis.all = TRUE, plots.cluster.analysis.all = TRUE,
     cores = 4L){
     
-    if(is.null(FCSpath) | is.null(Outpath) | is.null(bkb.v)){
+    #run Vignette
+    if(runVignette == TRUE){
+    if(is.null(Outpath)){
+    message("\nPlease make sure the output path has been specified!")
+    }
+    
+    chans <- bkb.v
+    
+    message("\n\n\nCreating directories for output...")
+    settings <- initialize(
+    path_to_fcs=FCSpath,
+    path_to_output=Outpath,
+    verbose=TRUE)
+    paths <- settings$paths
+    
+    ###
+    
+    saveRDS(runVignette_meta, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))
+    saveRDS(runVignette_rawInten, file = file.path(paths["intermediary"], "/fcs_rawInten_mt.rds"))
+    
+    ##omitting - 1.fcs to rds
+    # fcs_to_rds(paths=paths, file_meta=file_meta, yvar = yvar)
+    
+    
+    ##2-1.bkc bkb
+    message("\n\n\nBackground correcting backbone markers...")
+    bkc_bkb(
+    paths=paths, bkb.v=bkb.v,
+    bkb.upper.quantile=bkb.upper.quantile, #cells used for estimating parameter of signal
+    bkb.lower.quantile=bkb.lower.quantile, #cells used for estimating parameters of noise
+    bkb.min.quantile=bkb.min.quantile,
+    plots=plots.bkc.bkb) #the lowest 1% of values will not be used to minimise the impact of outliers on sig
+    
+    ##2-2.bkc inf
+    message("\n\n\nBackground correcting infinity markers...")
+    bkc_pe(
+    paths=paths,
+    pe.lower.quantile=inf.lower.quantile, #cells used for estimating parameters of noise
+    pe.min.quantile=inf.min.quantile, #the lowest 1% of values will not be used to minimize the impact of outliers on sig
+    plots=plots.bkc.inf)
+    
+    ##3-0.initM
+    message("\n\n\nForming a matrix of biology for removal of well effect...")
+    initM(
+    paths=paths, assay="MPC", bkb.v=bkb.v,
+    plots=plots.initM) #may give "cent.log.bkc" in the next version
+    
+    ##3-1.rmWellEffect
+    message("\n\n\nRemoval of well effect...")
+    rmWellEffect(
+    paths=paths,
+    plots = plots.rmWellEffect)
+    
+    if(impute==TRUE){
+    message("\n\n\nImputation...")
+    ##4.prep. for imputation - combine normalised.bkb.inf
+    mkImputeMT(paths=paths)
+    
+    ##5.impu. using bkb as predictors
+    imputation_bkb.predictors(
+    paths=paths,
+    chans=chans,
+    yvar="Legend", #have named this in my fcs_to_rds function
+    cores=cores,
+    models.use = models.use,
+    extra_args_regression_params = extra_args_regression_params,
+    prediction_events_downsampling = prediction_events_downsampling,
+    impu.training = impu.training,
+    plots = plots.imputation)
+    
+    ##6.cluster analysis all (bkb+impu.inf)
+    message("\n\n\nCluster analysis with completed dataset...")
+    if(cluster.analysis.all == TRUE){
+    cluster.analysis(
+    paths=paths,
+    bkb.v=bkb.v,
+    yvar="Legend",
+    control.wells=control.wells,
+    plots = plots.cluster.analysis.all)
+    }
+    }
+    
+    ##7.cluster analysis bkbOnly
+    message("\n\n\nCluster analysis with adjusted backbone markers...")
+    if(cluster.analysis.bkb == TRUE){
+    cluster.analysis.bkbOnly(
+    paths=paths,
+    bkb.v=bkb.v,
+    plots = plots.cluster.analysis.bkb)
+    }
+    
+    message("\tCompleted!")
+    }
+    
+    #not running Vignette
+    if(runVignette == FALSE){
+    
+    if(runVignette == FALSE | is.null(FCSpath) | is.null(Outpath) | is.null(bkb.v)){
     message("\nPlease make sure you have specified\n(1) path to the FCS files, and metadata (if file_meta=\"usr\") \n(2) output path \n(3) a list of backbone markers")
     }
 
@@ -118,6 +226,7 @@ function(
     }
     
     ##/!\ Potentially add a check here to make sure parameters are consistent with FCS files
+    message("\n\n\nCreating directories for output...")
     
     settings <- initialize(
     path_to_fcs=FCSpath,
@@ -128,10 +237,12 @@ function(
     ###
     
     ##1.fcs to rds
+    message("\n\n\nTransforming FCS to RDS files...")
     fcs_to_rds(paths=paths, file_meta=file_meta, yvar = yvar)
     
     
     ##2-1.bkc bkb
+    message("\n\n\nBackground correcting backbone markers...")
     bkc_bkb(
     paths=paths, bkb.v=bkb.v,
     bkb.upper.quantile=bkb.upper.quantile, #cells used for estimating parameter of signal
@@ -140,6 +251,7 @@ function(
     plots=plots.bkc.bkb) #the lowest 1% of values will not be used to minimise the impact of outliers on sig
     
     ##2-2.bkc inf
+    message("\n\n\nBackground correcting infinity markers...")
     bkc_pe(
     paths=paths,
     pe.lower.quantile=inf.lower.quantile, #cells used for estimating parameters of noise
@@ -147,16 +259,19 @@ function(
     plots=plots.bkc.inf)
     
     ##3-0.initM
+    message("\n\n\nForming a matrix of biology (M) for removal of well effect...")
     initM(
     paths=paths, assay="MPC", bkb.v=bkb.v,
     plots=plots.initM) #may give "cent.log.bkc" in the next version
     
     ##3-1.rmWellEffect
+    message("\n\n\nRemoval of well effect...")
     rmWellEffect(
     paths=paths,
     plots = plots.rmWellEffect)
     
     if(impute==TRUE){
+    message("\n\n\nImputation got started...")
     ##4.prep. for imputation - combine normalised.bkb.inf
     mkImputeMT(paths=paths)
     
@@ -172,7 +287,8 @@ function(
     impu.training = impu.training,
     plots = plots.imputation)
     
-    ##6.cluster analysis all (bkb+impu.inf)
+    ##6.cluster analysis all (bkb, bkb+impu.inf)
+    message("\n\n\nCluster analysis with adjusted backbone markers and completed dataset...")
     if(cluster.analysis.all == TRUE){
     cluster.analysis(
     paths=paths,
@@ -183,15 +299,18 @@ function(
     }
     }
     
-    ##7.cluster analysis bkbOnly
-    if(cluster.analysis.bkb == TRUE){
-    cluster.analysis.bkbOnly(
-    paths=paths,
-    bkb.v=bkb.v,
-    plots = plots.cluster.analysis.bkb)
-    }
+    # ##7.cluster analysis bkbOnly (no need for if used 6.)
+    # message("\n\n\nCluster analysis with adjusted backbone markers...")
+    # if(cluster.analysis.bkb == TRUE){
+    # cluster.analysis.bkbOnly(
+    # paths=paths,
+    # bkb.v=bkb.v,
+    # plots = plots.cluster.analysis.bkb)
+    # }
     
     message("\tCompleted!")
     
     }
     }
+    }
+

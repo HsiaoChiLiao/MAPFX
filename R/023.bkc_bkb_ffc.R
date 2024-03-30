@@ -90,7 +90,8 @@ function(
     fn=nlogl.norm.v2,
     xx=first.quantile,
     n=length(ordering.bkb)),
-    error = function(e){NA}))
+    error = function(e){NA})
+    )
     mle.mean <- out.1$par[1]
     mle.sd <- exp(out.1$par[2])
     
@@ -101,13 +102,15 @@ function(
     {
     last.quantile <- ordering.bkb[which(ordering.bkb > quantile(ordering.bkb, probs = upper.quantile))] #or +2*mle.sd
     p.init <- ifelse(mean(last.quantile) < 0, log(0.000001), log(mean(last.quantile)))
-    suppressWarnings(
+    # suppressWarnings(
     out.2 <- tryCatch(optim(
     par=p.init,
     fn=nlogl.exp,
     xx=last.quantile,
-    n=length(ordering.bkb)),
-    error = function(e){NA}))
+    n=length(ordering.bkb),
+    method = "Brent", lower = -20, upper = 0),
+    error = function(e){NA})
+    # )
     
     # exp(p[1]) = 1/exponential mean = 1/alpha
     alpha <- (1/exp(out.2$p))
@@ -116,7 +119,7 @@ function(
     # print(paste0('batch=',w,',alpha=',round(alpha[length(alpha)],1)))
     }
     para.ls[[m]] <- para.df
-    message('bkb=',m)
+    message('backbone: ',m)
     }
     names(para.ls) <- colnames(sel.bkb.raw)
     saveRDS(para.ls, file = file.path(paths["intermediary"], paste0("para.ls_",ncol(sel.bkb.raw),"bkb_",length(unique(metadata.cell$Batch)),"batch.rds")))

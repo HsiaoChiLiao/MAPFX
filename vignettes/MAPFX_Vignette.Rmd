@@ -93,12 +93,14 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("MAPFX")
-
-library(MAPFX)
 ```
 
 Along with the MAPFX package, we also load the following packages required for running functions in MAPFX.
 ```{r, dependency}
+library(MAPFX)
+
+## specify the package names
+suppressPackageStartupMessages({
 library(flowCore)
 library(Biobase)
 library(stringr)
@@ -123,30 +125,37 @@ library(gtools)
 library(utils)
 library(stats)
 library(cowplot)
+})
+
 ```
 
-## The Example Datasets in the MapfxData Package
-**Soon will be available from the Experiment Data Package - MapfxData.**\
-
+## Using the Example Raw Files in MAPFX Package for this Vignette
 ### MPC
-This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [@inflow]. The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
+This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) provided by Etienne Becht (Nov 2020). The raw data contains 266 .FCS files from 266 wells with 50 cells in each file.
 
 ### FFC
-This dataset contains 316,779 cells (sorted CD4+ and CD8+ T cells) from mice splenocytes that was downloaded from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023).
+This dataset contains 50 cells (sorted CD4+ and CD8+ T cells) in each .FCS files from mice splenocytes that was down-sampled from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023). Batch information is in the `filename_meta.csv` file in the `inst/extdata/FFC/meta/` directory.
 
 ## `MapfxMPC(..., impute=TRUE)` - analysing data from MPC experiments
 For users who would like to perform all of the following steps: background correction, removal of unwanted variation (well effects), **imputation**, and cluster analysis.
 
-```{r, MapfxMPC_example}
-MAPFX::MapfxMPC()
-```         
-```{r, MapfxMPC_impu, eval=FALSE}
+```{r, MapfxMPC_impu_example, eval=TRUE}
+# import built-in data
+data(ord.fcs.raw.meta.df.out_mpc)
+data(ord.fcs.raw.mt_mpc)
+
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+dir.create(file.path(getwd(), "MPC_impu_Output"))
+
 # usage
 # when impute = TRUE, randomly selecting 50% of the cells in each well for model training
 set.seed(123) 
 MapfxMPC(
-    FCSpath = "/FCSpath/FCS/",
-    Outpath = "/Outpath/Output/",
+    runVignette = TRUE, #set FALSE if not running this Vignette
+    runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
+    runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
+    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
+    Outpath = file.path(getwd(), "MPC_impu_Output"), # or users specify their own path: "/Outpath/Output/",
     file_meta = "auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -184,11 +193,21 @@ All the output will be stored in the `/Outpath/Output/`.
 
 ## `MapfxMPC(..., impute=FALSE)` - normalising data from MPC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (well effects), and cluster analysis using backbones only.
-```{r, MapfxMPC_norm, eval=FALSE}
+```{r, mapfxNorm_MPC, eval=FALSE}
+# import built-in data
+data(ord.fcs.raw.meta.df.out_mpc)
+data(ord.fcs.raw.mt_mpc)
+
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+dir.create(file.path(getwd(), "MPC_NOimpu_Output"))
+
 # usage
 MapfxMPC(
-    FCSpath="/FCSpath/FCS/",
-    Outpath="/Outpath/Output/",
+    runVignette = TRUE, #set FALSE if not running this Vignette
+    runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
+    runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
+    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
+    Outpath = file.path(getwd(), "MPC_NOimpu_Output"), # or users specify their own path: "/Outpath/Output/",
     file_meta="auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -220,14 +239,21 @@ All the output will be stored in the `/Outpath/Output/`.
 
 ## `MapfxFFC` - normalising data from FFC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (batch effects), and cluster analysis.
-```{r, MapfxFFC_example}
-MAPFX::MapfxFFC()
-```         
-```{r, mapfxNorm, eval=FALSE}
+```{r, mapfxNorm_FFC, eval=TRUE}
+# import built-in data
+data(ord.fcs.raw.meta.df.out_ffc)
+data(ord.fcs.raw.mt_ffc)
+
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+dir.create(file.path(getwd(), "FFCnorm_Output"))
+
 MapfxFFC(
-    FCSpath = "/FCSpath/FCS/",
-    Outpath = "/Outpath/Output/",
-    file_meta = "auto",
+    runVignette = TRUE, #set FALSE if not running this Vignette
+    runVignette_meta = ord.fcs.raw.meta.df.out_ffc, #set NULL if not running this Vignette
+    runVignette_rawInten = ord.fcs.raw.mt_ffc, #set NULL if not running this Vignette
+    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
+    Outpath = file.path(getwd(), "FFCnorm_Output"), # or users specify their own path: "/Outpath/Output/",
+    file_meta = "usr",
     protein.v = c("CD3","CD4","CD8","CD45"),
     protein.upper.quantile = 0.9, 
     protein.lower.quantile = 0.1, 
@@ -241,7 +267,7 @@ MapfxFFC(
 help(MapfxFFC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in the `Output` directory of the working directory or the path `/Outpath/Output/` that user specified.
 
 ## Description of the output
 Three folders will be automatically generated in `/Outpath/Output/`.\
@@ -253,6 +279,15 @@ Final results will be saved in the `.rds` format and will be stored here. The re
 Figures will be stored here, including **scatter plots** for comparing background corrected and raw protein intensities for each protein marker, **heatmaps** for presenting the biological and unwanted effects in the data before and after removal of unwanted variation with *mapfx.norm*, **boxplots** (for imputations from multiple models) and **a boxplot and a histogram** (for imputations from a single model) of R-sq values for visualising the accuracy of imputed infinity (exploratory) markers, and **UMAP plots** for showing the cluster structure.
 
 ## Examples of the output figures
+## Using the Example Datasets in the MapfxData Package
+**Soon will be available from the Experiment Data Package - MapfxData.**\
+
+### MPC
+This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [@inflow]. The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
+
+### FFC
+This dataset contains 316,779 cells (sorted CD4+ and CD8+ T cells) from mice splenocytes that was downloaded from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023).
+
 ### Background Correction 
 This step works on both MPC and FFC data.
 

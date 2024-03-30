@@ -57,7 +57,7 @@ function(
     
     res.df[,i] <- res
     
-    message("Processing bkb: ", i)
+    message("Processing backbone: ", i)
     }
     
     names(lm.results.ls) <- colnames(bkc.bkb)
@@ -116,7 +116,7 @@ function(
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
     # ln.sig.v[i] <- sd(lm.result$residuals)
     
-    message("Processing bkb: ", i)
+    message("Processing backbone: ", i)
     }
     
     names(adj.lm.results.ls) <- colnames(log.adj.data)

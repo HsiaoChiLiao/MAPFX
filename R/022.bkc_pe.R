@@ -68,12 +68,13 @@ function(
     }
     
     ## estimating parameters and calibrating values
-    message("\tEstimating parameters for calibration AND calibrating PE markers...")
+    message("\tEstimating parameters for calibration AND calibrating infinity markers...")
     para.df <- data.frame(Well.lab = unique(metadata.cell$Well.lab), mu = NA, sig = NA, alpha = NA)
     
     calib.dat.ls <- list()
     samp.alpha <- c()
     criteria.alpha <- c()
+    few.cell.well.ls <- list()
     for(i in seq_along(para.df[,1])){ #1:nrow(para.df)
     well.here <- para.df$Well.lab[i]
     dat.here <- as.matrix(pe.raw[which(metadata.cell$Well.lab == well.here),1])
@@ -88,13 +89,14 @@ function(
     ini.log.sd <- log(sd(first.quantile))
     p.init <- c(ini.mu, ini.log.sd)
     
-    suppressWarnings(
+    # suppressWarnings(
     out.1 <- tryCatch(optim(
     par=p.init,
     fn=nlogl.norm.v2,
     xx=first.quantile,
     n=length(ordering.legend)),
-    error = function(e){NA}))
+    error = function(e){NA})
+    # )
     
     mle.mean <- out.1$par[1]
     mle.sd <- exp(out.1$par[2])
@@ -103,12 +105,12 @@ function(
     para.df$sig[i] <- mle.sd
     
     ## estimate log alpha using tryCatch, so it will not stop if some markers return error
+    ## orig with large no cell: mle.mean+3*mle.sd -> mle.mean+1*mle.sd
     last.mu.3sd <- ordering.legend[which(ordering.legend > (mle.mean+3*mle.sd))]
-    if(length(last.mu.3sd) == 0){
-    last.mu.3sd <- ordering.legend[which(ordering.legend > (mle.mean+1*mle.sd))]
-    message("Could not find cells when used \"mle.mean+3*mle.sd\": ", well.here, "; ",
-    "Number of cells for estimating alpha with the threshold \"mean+1sd\": ", length(last.mu.3sd))
-    criteria.alpha[i] <- "mean+1sd"
+    if(length(last.mu.3sd) < 10){
+    last.mu.3sd <- ordering.legend[which(ordering.legend >= head(ordering.legend,10))]
+    criteria.alpha[i] <- "largest10"
+    few.cell.well.ls[[i]] <- well.here
     }else{
     criteria.alpha[i] <- "mean+3sd"
     }
@@ -119,8 +121,10 @@ function(
     par=p.init,
     fn=nlogl.exp,
     xx=last.mu.3sd,
-    n=length(ordering.legend)),
-    error = function(e){NA}))
+    n=length(ordering.legend),
+    method = "Brent", lower = -20, upper = 0),
+    error = function(e){NA})
+    )
     
     # exp(p[1]) = 1/exponential mean = 1/alpha
     alpha <- (1/exp(out.2$p))
@@ -133,6 +137,7 @@ function(
     
     # print(paste0('Iteration=',i,', alpha=',round(alpha[length(alpha)],1)))
     }
+    message("Could not find enough cells (>=10) when used \"mle.mean+3*mle.sd\", so estimated alpha with the \"largest 10\" cells:\n", cat(do.call(c, few.cell.well.ls), sep=", "))
     para.df <- cbind(para.df, samp.alpha, criteria.alpha)
     saveRDS(para.df, file = file.path(paths["intermediary"], "para.266pe.rds"))
     
@@ -154,5 +159,5 @@ function(
     dev.off()
     }
     }
-    message("\tCalibration of Legend markers... Completed!")
+    message("\tCalibration of infinity markers... Completed!")
     }

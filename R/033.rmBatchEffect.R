@@ -56,7 +56,7 @@ function(
     
     res.df[,i] <- res
     
-    message("Processing bkb: ", i)
+    message("Processing backbone: ", i)
     }
     
     names(lm.results.ls) <- colnames(bkc.bkb)
@@ -79,7 +79,7 @@ function(
     a <- Sys.time()
     for(i in seq_along(bkc.bkb[1,])){ #1:ncol(bkc.bkb)
     
-    unwanted.eff <- (xx[,(2:21)] %*% quant.bio.pcr.mt[(2:21), i])
+    unwanted.eff <- (xx[,(2:length(unique(metadata.cell$Batch)))] %*% quant.bio.pcr.mt[(2:length(unique(metadata.cell$Batch))), i])
     
     log.adj.data[,i] <- (log(bkc.bkb[,i]+0.000001) - unwanted.eff) #as the coef was estimated from data on log scale
     
@@ -114,7 +114,7 @@ function(
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
     # ln.sig.v[i] <- sd(lm.result$residuals)
     
-    message("Processing bkb: ", i)
+    message("Processing backbone: ", i)
     }
     
     names(adj.lm.results.ls) <- colnames(log.adj.data)
@@ -137,10 +137,10 @@ function(
     in.dat <- list(quant.bio.pcr.mt[-c(1,nrow(quant.bio.pcr.mt)),], adj.quant.bio.pcr.mt[-c(1,nrow(adj.quant.bio.pcr.mt)),])
     in.dat <- list(rbind(
     in.dat[[1]][seq_len(length(unique(metadata.cell$Batch))-1),], Batchlast = -colsums(in.dat[[1]][seq_len(length(unique(metadata.cell$Batch))-1),]),
-    in.dat[[1]][length(unique(metadata.cell$Batch)):nrow(in.dat[[1]]),], init.Mlast = -colsums(in.dat[[1]][21:nrow(in.dat[[1]]),])),
+    in.dat[[1]][length(unique(metadata.cell$Batch)):nrow(in.dat[[1]]),], init.Mlast = -colsums(in.dat[[1]][length(unique(metadata.cell$Batch)):nrow(in.dat[[1]]),])),
     rbind(
     in.dat[[2]][seq_len(length(unique(metadata.cell$Batch))-1),], Batchlast = -colsums(in.dat[[2]][seq_len(length(unique(metadata.cell$Batch))-1),]),
-    in.dat[[2]][length(unique(metadata.cell$Batch)):nrow(in.dat[[2]]),], init.Mlast = -colsums(in.dat[[2]][21:nrow(in.dat[[2]]),]))
+    in.dat[[2]][length(unique(metadata.cell$Batch)):nrow(in.dat[[2]]),], init.Mlast = -colsums(in.dat[[2]][length(unique(metadata.cell$Batch)):nrow(in.dat[[2]]),]))
     )
     #batch
     rownames(in.dat[[1]])[length(unique(metadata.cell$Batch))] <- paste0("Batch", length(unique(metadata.cell$Batch)))

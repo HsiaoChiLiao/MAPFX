@@ -127,7 +127,7 @@ function(
     ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(8,1,3,5,6,4,7)]
     }
     
-    if(MPC == FALSE){
+    if(MPC == FALSE & file_meta == "usr"){
     meta.inf <- read.csv(file = file.path(paths["input"], "/meta/filename_meta.csv"))
     for(i in seq_along(fs)){
     fcs.raw.mt.list[[i]] <- exprs(fs[[i]])
@@ -157,6 +157,8 @@ function(
     
     #out rds
     ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(4,1,3)]
+    }else{
+    stop("Please provide a `filename_meta.csv` file and set the argument file_meta == \"usr\"")
     }
     
     saveRDS(ord.fcs.raw.meta.df.out, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))

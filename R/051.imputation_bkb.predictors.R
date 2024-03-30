@@ -319,7 +319,7 @@ function(
     saveRDS(metadata.cell, file = file.path(paths["intermediary"], "fcs_metadata_df.rds"))
     
     ## imputation
-    message("\tImputing unmeasured well-specific markers...")
+    message("\tImputing infinity (unmeasured well-specific) markers...")
     {
     xp_orig <- xp
     xp <- xp[, chans]

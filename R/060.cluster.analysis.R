@@ -41,7 +41,7 @@ function(
     names(bkb.v) <- make.names(bkb.v)
     
     for(i in seq_along(preds)){
-    message("Cluster analysis for ", names(preds)[i], "...")
+    # message("Cluster analysis using imputed values from ", names(preds)[i], "...")
     impu.mt <- preds[[i]]
     
     if(i == 1){ ## bkb only need to do once
@@ -65,7 +65,7 @@ function(
     }
     
     ###
-    message("Clustering with normalised backbones + imputed PE markers") #now: use them all - may just pick good ones in the future
+    message("Clustering with normalised backbones + imputed infinity markers (", names(preds)[i], ")") #now: use them all - may just pick good ones in the future
     complete.dat <- impu.mt[, -match(c(yvar, control.wells), colnames(impu.mt))]
     message("Running UMAP...")
     a <- Sys.time()

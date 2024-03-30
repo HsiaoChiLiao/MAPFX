@@ -4,7 +4,10 @@
 \alias{MapfxMPC}
 \title{MAssively Parallel Flow cytometry Xplorer (MAPFX)}
 \usage{
-MapfxMPC(FCSpath,
+MapfxMPC(runVignette = FALSE,
+         runVignette_meta = NULL,
+         runVignette_rawInten = NULL,
+         FCSpath,
          Outpath,
          file_meta = "auto",
          bkb.v,
@@ -29,6 +32,12 @@ MapfxMPC(FCSpath,
          cores = 4L)
 }
 \arguments{
+\item{runVignette}{logical; if FALSE (default), specify a path to \code{FCSpath} argument; TRUE for running Vignette using built-in data.}
+
+\item{runVignette_meta}{the argument for the built-in metadata when running Vignette; NULL (default).}
+
+\item{runVignette_rawInten}{the argument for the built-in raw intensities when running Vignette; NULL (default).}
+
 \item{FCSpath}{path to the input directory where \code{filename_meta.csv} and FCS files are stored (one file per well). \code{filename_meta.csv} should be saved under \verb{FCSpath/FCS/meta/} and FCS files should be saved under \verb{FCSpath/FCS/fcs/} (See Vignette for details.)}
 
 \item{Outpath}{path to the output directory where intermediate results and final results will be stored.}

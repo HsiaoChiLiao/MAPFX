@@ -2,6 +2,9 @@
 #'
 #' @description This function is used to normalise, including background correction and removal of batch effects, protein intensity data from FFC assays. The input data is in FCS format. The functions include data normalisation and cluster analysis.
 #'
+#' @param runVignette logical; if FALSE (default), specify a path to `FCSpath` argument; TRUE for running Vignette using built-in data.
+#' @param runVignette_meta the argument for the built-in metadata when running Vignette; NULL (default).
+#' @param runVignette_rawInten the argument for the built-in raw intensities when running Vignette; NULL (default).
 #' @param FCSpath path to the input directory where `filename_meta.csv` and FCS files are stored. `filename_meta.csv` should be saved under `FCSpath/FCS/meta/` and FCS files should be saved under `FCSpath/FCS/fcs/`. See Vignette for details.
 #' @param Outpath path to the output directory where intermediate results and final results will be stored.
 #' @param file_meta if the file names of the FCS files are in the specified format, set `file_meta = "auto"`; otherwise set `file_meta = "usr"` and provide a `filename_meta.csv` file in `FCSpath/FCS/meta/`.
@@ -17,15 +20,20 @@
 #'
 #' @author Hsiao-Chi Liao, Agus Salim
 #'
+#' @importFrom utils data
+#'
 #' @export
 #' @return Normalised protein and infinity measurements for the MPC data; normalised protein measurements for the FFC data. Cluster analysis for normalised proteins. Graphs will be provided if specified.
 #' @examples
 #' MapfxFFC()
 #' 
 #' @usage
-#' MapfxFFC(FCSpath,
+#' MapfxFFC(runVignette = FALSE,
+#'          runVignette_meta = NULL,
+#'          runVignette_rawInten = NULL,
+#'          FCSpath,
 #'          Outpath,
-#'          file_meta="auto",
+#'          file_meta="usr",
 #'          protein.v,
 #'          protein.upper.quantile = 0.9, 
 #'          protein.lower.quantile = 0.1, 
@@ -37,9 +45,12 @@
 #'
 MapfxFFC <-
 function(
+    runVignette = FALSE,
+    runVignette_meta = NULL,
+    runVignette_rawInten = NULL,
     FCSpath = NULL,
     Outpath = NULL,
-    file_meta = "auto",
+    file_meta = "usr",
     protein.v = NULL,
     protein.upper.quantile = 0.9, 
     protein.lower.quantile = 0.1, 
@@ -49,27 +60,31 @@ function(
     plots.rmBatchEffect = TRUE,
     cluster.analysis.protein = TRUE, plots.cluster.analysis.protein = TRUE){
     
-    if(is.null(FCSpath) | is.null(Outpath) | is.null(protein.v)){
-    message("\nPlease make sure you have specified\n(1) path to the FCS files, and metadata (if file_meta=\"usr\") \n(2) output path \n(3) a list of protein markers")
+    #run Vignette
+    if(runVignette == TRUE){
+    if(is.null(Outpath)){
+    message("\nPlease make sure the output path has been specified!")
     }
     
-    if(!is.null(FCSpath) & !is.null(Outpath) & !is.null(protein.v)){
-    
+    message("\n\n\nCreating directories for output...")
     settings <- initialize(
     path_to_fcs=FCSpath,
     path_to_output=Outpath,
     verbose=TRUE)
-    
     paths <- settings$paths
     
     ###
     
-    ##1.fcs to rds
-    fcs_to_rds_bkb(
-    paths=paths, file_meta=file_meta, MPC = FALSE)
+    saveRDS(runVignette_meta, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))
+    saveRDS(runVignette_rawInten, file = file.path(paths["intermediary"], "/fcs_rawInten_mt.rds"))
+    
+    ##omitting - 1.fcs to rds
+    #fcs_to_rds_bkb(
+    #paths=paths, file_meta=file_meta, MPC = FALSE)
     
     
     ##2-1.bkc protein
+    message("\n\n\nBackground correcting proteins...")
     bkc_bkb_ffc(
     paths=paths, bkb.v=protein.v,
     bkb.upper.quantile=protein.upper.quantile, #cells used for estimating parameter of signal
@@ -78,17 +93,78 @@ function(
     plots=plots.bkc.protein) #the lowest 1% of values will not be used to minimise the impact of outliers on sig
     
     ##3-0.initM
+    message("\n\n\nForming a matrix of biology (M) for removal of batch effect...")
     initM(
     paths=paths, assay="FFC", bkb.v=protein.v,
     plots=plots.initM) #may give "cent.log.bkc" in the next version
     
     ##3-1.rmBatchEffect
+    message("\n\n\nRemoval of batch effect...")
     rmBatchEffect(
     paths=paths,
     plots = plots.rmBatchEffect)
     
     ##7.cluster analysis proteinOnly
     if(cluster.analysis.protein == TRUE){
+    message("\n\n\nCluster analysis with adjusted protein markers...")
+    cluster.analysis.bkbOnly(
+    paths=paths,
+    bkb.v=protein.v,
+    plots = plots.cluster.analysis.protein)
+    }
+    
+    message("\tCompleted!")
+    }
+    
+    #not running Vignette
+    if(runVignette == FALSE){
+    
+    if(runVignette == FALSE | is.null(FCSpath) | is.null(Outpath) | is.null(protein.v)){
+    message("\nPlease make sure you have specified\n(1) path to the FCS files, and metadata (if file_meta=\"usr\") \n(2) output path \n(3) a list of protein markers")
+    }
+    
+    if(!is.null(FCSpath) & !is.null(Outpath) & !is.null(protein.v)){
+    
+    message("\n\n\nCreating directories for output...")
+    
+    settings <- initialize(
+    path_to_fcs=FCSpath,
+    path_to_output=Outpath,
+    verbose=TRUE)
+    paths <- settings$paths
+    
+    ###
+    
+    ##1.fcs to rds
+    message("\n\n\nTransforming FCS to RDS files...")
+    fcs_to_rds_bkb(
+    paths=paths, file_meta=file_meta, MPC = FALSE)
+    
+    
+    ##2-1.bkc protein
+    message("\n\n\nBackground correcting proteins...")
+    bkc_bkb_ffc(
+    paths=paths, bkb.v=protein.v,
+    bkb.upper.quantile=protein.upper.quantile, #cells used for estimating parameter of signal
+    bkb.lower.quantile=protein.lower.quantile, #cells used for estimating parameters of noise
+    bkb.min.quantile=protein.min.quantile,
+    plots=plots.bkc.protein) #the lowest 1% of values will not be used to minimise the impact of outliers on sig
+    
+    ##3-0.initM
+    message("\n\n\nForming a matrix of biology for removal of batch effect...")
+    initM(
+    paths=paths, assay="FFC", bkb.v=protein.v,
+    plots=plots.initM) #may give "cent.log.bkc" in the next version
+    
+    ##3-1.rmBatchEffect
+    message("\n\n\nRemoval of batch effect...")
+    rmBatchEffect(
+    paths=paths,
+    plots = plots.rmBatchEffect)
+    
+    ##7.cluster analysis proteinOnly
+    if(cluster.analysis.protein == TRUE){
+    message("\n\n\nCluster analysis with adjusted protein markers...")
     cluster.analysis.bkbOnly(
     paths=paths,
     bkb.v=protein.v,
@@ -97,4 +173,6 @@ function(
     
     message("\tCompleted!")  
     }
-}
+    }
+    }
+

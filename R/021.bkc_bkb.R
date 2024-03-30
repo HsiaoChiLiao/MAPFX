@@ -86,13 +86,14 @@ function(
     ini.log.sd <- log(sd(first.quantile))
     p.init <- c(ini.mu, ini.log.sd)
     
-    suppressWarnings(
+    # suppressWarnings(
     out.1 <- tryCatch(optim(
     par=p.init,
     fn=nlogl.norm.v2,
     xx=first.quantile,
     n=length(ordering.bkb)),
-    error = function(e){NA}))
+    error = function(e){NA})
+    # )
     mle.mean <- out.1$par[1]
     mle.sd <- exp(out.1$par[2])
     
@@ -108,8 +109,10 @@ function(
     par=p.init,
     fn=nlogl.exp,
     xx=last.quantile,
-    n=length(ordering.bkb)),
-    error = function(e){NA}))
+    n=length(ordering.bkb),
+    method = "Brent", lower = -20, upper = 0),
+    error = function(e){NA})
+    )
 
     # exp(p[1]) = 1/exponential mean = 1/alpha
     alpha <- (1/exp(out.2$p))
@@ -118,7 +121,7 @@ function(
     # print(paste0('well=',w,',alpha=',round(alpha[length(alpha)],1)))
     }
     para.ls[[m]] <- para.df
-    message('bkb=',m)
+    message('backbone: ',m)
     }
     names(para.ls) <- colnames(sel.bkb.raw)
     saveRDS(para.ls, file = file.path(paths["intermediary"], paste0("para.ls_",ncol(sel.bkb.raw),"bkb_",length(unique(metadata.cell$Well.lab)),"well.rds")))
