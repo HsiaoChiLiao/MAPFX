@@ -89,14 +89,14 @@ function(
     ini.log.sd <- log(sd(first.quantile))
     p.init <- c(ini.mu, ini.log.sd)
     
-    # suppressWarnings(
+    suppressWarnings(
     out.1 <- tryCatch(optim(
     par=p.init,
     fn=nlogl.norm.v2,
     xx=first.quantile,
     n=length(ordering.legend)),
     error = function(e){NA})
-    # )
+    )
     
     mle.mean <- out.1$par[1]
     mle.sd <- exp(out.1$par[2])
