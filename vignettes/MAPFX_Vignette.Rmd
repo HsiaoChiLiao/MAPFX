@@ -1,6 +1,6 @@
 ---
 title: "MAPFX: MAssively Parallel Flow cytometry Xplorer"
-author: "Hsiao-Chi Liao"
+author: "Hsiao-Chi Liao and Agus Salim"
 date: "`r Sys.Date()`"
 output:
   BiocStyle::html_document:
@@ -19,6 +19,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introduction
+## Motivation
+Massively-Parallel Cytometry (MPC) experiments allow cost-effective quantification of more than 200 surface proteins at single-cell resolution. The Inflow protocol [@inflow] is the pioneer of the pipeline for analysing MPC data, and the Bioconductor's `infinityFlow` package was developed for comprehensive analyses. However, the methods for background correction and removal of unwanted variation implemented in the package can be improved. We develop the `MAPFX` package as an alternative that has a more thoughtful strategy to clean up the raw protein intensities. Unique features of our package compared to the `infinityFlow` pipeline include performing background correction prior to imputation and removing unwanted variation from the data at the cell-level, while explicitly accounting for the potential association between biology and unwanted factors. We benchmarked our pipeline against the `infinityFlow` pipeline and demonstrated that our approach is better at preserving biological signals, removing unwanted variation, and imputing unmeasured infinity markers [@mapfx]. Two user friendly functions `MapfxMPC` and `MapfxFFC` are included in the `MAPFX` package that were designed for data from either MPC or FFC experiments (see below sections for details). 
+
 ## Experimental and Computational Pipeline of the Data from the Massively-Parallel Cytometry (MPC) Experiments
 
 ![](F1.exp_compu_pipeline.png)
@@ -134,7 +137,7 @@ library(cowplot)
 This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) provided by Etienne Becht (Nov 2020). The raw protein intensities and the corresponding metadata were saved in the objects `ord.fcs.raw.mt_mpc` and `ord.fcs.raw.meta.df.out_mpc` which were generated from 266 .FCS files from 266 wells with 50 cells in each file.
 
 ### FFC
-This dataset contains 50 cells (sorted CD4+ and CD8+ T cells) in each .FCS files from mice splenocytes that was down-sampled from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023). The raw protein intensities and the corresponding metadata were saved in the objects `ord.fcs.raw.mt_ffc` and `ord.fcs.raw.meta.df.out_ffc`.
+This mice splenocytes dataset contains 50 cells (sorted CD4+ and CD8+ T cells) in each .FCS files which was down-sampled from the data provided by Jalal Alshaweesh (Oct 2023) on [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG). The raw protein intensities and the corresponding metadata were saved in the objects `ord.fcs.raw.mt_ffc` and `ord.fcs.raw.meta.df.out_ffc`.
 
 ## `MapfxMPC(..., impute=TRUE)` - analysing data from MPC experiments
 For users who would like to perform all of the following steps: background correction, removal of unwanted variation (well effects), **imputation**, and cluster analysis.
@@ -145,7 +148,7 @@ data(ord.fcs.raw.meta.df.out_mpc)
 data(ord.fcs.raw.mt_mpc)
 
 # create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
-dir.create(file.path(getwd(), "MPC_impu_Output"))
+dir.create(file.path(tempdir(), "MPC_impu_Output"))
 
 # usage
 # when impute = TRUE, randomly selecting 50% of the cells in each well for model training
@@ -155,7 +158,7 @@ MapfxMPC(
     runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
     FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(getwd(), "MPC_impu_Output"), # or users specify their own path: "/Outpath/Output/",
+    Outpath = file.path(tempdir(), "MPC_impu_Output"), # or users specify their own path: "/Outpath/Output/",
     file_meta = "auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -189,7 +192,7 @@ MapfxMPC(
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in `file.path(tempdir(), "MPC_impu_Output")` (users can specify their own path: `/Outpath/Output/`).
 
 ## `MapfxMPC(..., impute=FALSE)` - normalising data from MPC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (well effects), and cluster analysis using backbones only.
@@ -199,7 +202,7 @@ data(ord.fcs.raw.meta.df.out_mpc)
 data(ord.fcs.raw.mt_mpc)
 
 # create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
-dir.create(file.path(getwd(), "MPC_NOimpu_Output"))
+dir.create(file.path(tempdir(), "MPC_NOimpu_Output"))
 
 # usage
 MapfxMPC(
@@ -207,7 +210,7 @@ MapfxMPC(
     runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
     FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(getwd(), "MPC_NOimpu_Output"), # or users specify their own path: "/Outpath/Output/",
+    Outpath = file.path(tempdir(), "MPC_NOimpu_Output"), # or users specify their own path: "/Outpath/Output/",
     file_meta="auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -235,7 +238,7 @@ MapfxMPC(
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in `file.path(tempdir(), "MPC_NOimpu_Output")` (users can specify their own path: `/Outpath/Output/`).
 
 ## `MapfxFFC` - normalising data from FFC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (batch effects), and cluster analysis.
@@ -245,14 +248,14 @@ data(ord.fcs.raw.meta.df.out_ffc)
 data(ord.fcs.raw.mt_ffc)
 
 # create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
-dir.create(file.path(getwd(), "FFCnorm_Output"))
+dir.create(file.path(tempdir(), "FFCnorm_Output"))
 
 MapfxFFC(
     runVignette = TRUE, #set FALSE if not running this Vignette
     runVignette_meta = ord.fcs.raw.meta.df.out_ffc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_ffc, #set NULL if not running this Vignette
     FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(getwd(), "FFCnorm_Output"), # or users specify their own path: "/Outpath/Output/",
+    Outpath = file.path(tempdir(), "FFCnorm_Output"), # or users specify their own path: "/Outpath/Output/",
     file_meta = "usr",
     protein.v = c("CD3","CD4","CD8","CD45"),
     protein.upper.quantile = 0.9, 
@@ -267,36 +270,36 @@ MapfxFFC(
 help(MapfxFFC, package = "MAPFX")
 ```
 
-All the output will be stored in the `Output` directory of the working directory or the path `/Outpath/Output/` that user specified.
+All the output will be stored in `file.path(tempdir(), "FFCnorm_Output")` (users can specify their own path: `/Outpath/Output/`).
+
 
 ## Description of the output
-Three folders will be automatically generated in `/Outpath/Output/`.\
+Three folders will be automatically generated in the output folder.\
 1. `intermediary`:\
-Intermediary results will be saved in the `.rds` and `.RData` formats and will be stored here.\
+Intermediary results will be saved in the `.rds` or `.RData` formats and will be stored here.\
 2. `downstream`:\
-Final results will be saved in the `.rds` format and will be stored here. The results include normalised backbone measurements (on both linear and log scale: `bkc.adj.bkb_linearScale_mt.rds` and `bkc.adj.bkb_logScale_mt.rds`), the completed dataset with imputed infinity (exploratory) markers (`predictions.Rds`), UMAP coordinates derived from both normalised backbones (`ClusterAnalysis_umap_#bkb.rds`) and the completed dataset (`ClusterAnalysis_ImpuMtd_umap_#bkb.#impuPE.rds`), and metadata (`fcs_metadata_df.rds`) for cells including cluster labels derived from both normalised backbones and the completed data matrix.\
+Final results will be saved in the `.rds` format and will be stored here. The results include normalised backbone measurements (on both linear and log scale: `bkc.adj.bkb_linearScale_mt.rds` and `bkc.adj.bkb_logScale_mt.rds`), the completed dataset with imputed infinity (exploratory, PE) markers (`predictions.Rds`), UMAP coordinates derived from both normalised backbones (`ClusterAnalysis_umap_#bkb.rds`) and the completed dataset (`ClusterAnalysis_ImpuMtd_umap_#bkb.#impuPE.rds`), and metadata (`fcs_metadata_df.rds`) for cells including cluster labels derived from both normalised backbones and the completed data matrix.\
 3. `graph`:\
-Figures will be stored here, including **scatter plots** for comparing background corrected and raw protein intensities for each protein marker, **heatmaps** for presenting the biological and unwanted effects in the data before and after removal of unwanted variation with *mapfx.norm*, **boxplots** (for imputations from multiple models) and **a boxplot and a histogram** (for imputations from a single model) of R-sq values for visualising the accuracy of imputed infinity (exploratory) markers, and **UMAP plots** for showing the cluster structure.
+Figures will be stored here, including **scatter plots** for comparing background corrected and raw protein intensities for each protein marker, **heatmaps** for presenting the biological and unwanted effects in the data before and after removal of unwanted variation with *mapfx.norm*, **boxplots** (for imputations from multiple models) and **a boxplot and a histogram** (for imputations from a single model) of R-sq values for visualising the accuracy of imputed infinity (exploratory, PE) markers, and **UMAP plots** for showing the cluster structure.
 
 ## Examples of the output figures
-## Using the Example Datasets in the MapfxData Package
-**Soon will be available from the Experiment Data Package - MapfxData.**\
+The MapfxData package (soon will be available) contains two example datasets that can be used for demonstration.\
 
-### MPC
-This dataset is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [@inflow]. The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
+1. MPC dataset:\
+It is a subset of the single-cell murine lung data at steady state downloaded from [FlowRepository](https://flowrepository.org/id/FR-FCM-Z2LP) [@inflow]. The raw data contains 266 .FCS files from 266 wells with 1000 cells in each file.
 
-### FFC
-This dataset contains 316,779 cells (sorted CD4+ and CD8+ T cells) from mice splenocytes that was downloaded from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023).
+2. FFC dataset:\
+It contains 316,779 cells (sorted CD4+ and CD8+ T cells) from mice splenocytes that was downloaded from [FlowRepository](http://flowrepository.org/id/FR-FCM-Z6UG) provided by Jalal Alshaweesh (Oct 2023).\
 
 ### Background Correction 
-This step works on both MPC and FFC data.
+This works on both MPC and FFC data.
 
 ![Figure 1](bkc.jpg)
 
 The comparison of background corrected values (y-axis) and raw intensities (x-axis) for a backbone marker (left, blue) and an infinity marker (right, gold) with a 45 degree line representing x=y. Our approach aims to "calibrate" the raw protein intensities, especially the non-positive values, without distorting large values too much.
 
 ### Removal of unwanted (well/batch) variation
-This step works on both MPC and FFC data.
+This works on both MPC and FFC data.
 
 ![Figure 2](ruv_mpc.jpg)
 
@@ -304,14 +307,14 @@ A. Maximum likelihood estimates of the unwanted (left) and the biological (right
 
 
 ### Performance of imputation
-This step works on MPC data.
+This works on MPC data.
 
 ![Figure 3](Rsq_boxplot_1model_500x800.jpeg)
 
 The histogram and boxplot of the R-sq values of infinity markers. Higher R-sq values represent better performance of imputation.
 
 ### Cluster analysis
-This step works on both MPC and FFC data.
+This works on both MPC and FFC data.
 
 ![Figure 4](cluster.jpg)
 
