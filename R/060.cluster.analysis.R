@@ -41,12 +41,11 @@ function(
     names(bkb.v) <- make.names(bkb.v)
     
     for(i in seq_along(preds)){
-    # message("Cluster analysis using imputed values from ", names(preds)[i], "...")
     impu.mt <- preds[[i]]
     
     if(i == 1){ ## bkb only need to do once
     message("Clustering with normalised backbones")
-    bkb.dat <- impu.mt[, match(names(bkb.v), colnames(impu.mt))]
+    bkb.dat <- impu.mt[, match(names(bkb.v), colnames(impu.mt)),drop=FALSE]
     message("Running UMAP...")
     a <- Sys.time()
     umap.bkb <- umap(
@@ -66,7 +65,7 @@ function(
     
     ###
     message("Clustering with normalised backbones + imputed infinity markers (", names(preds)[i], ")") #now: use them all - may just pick good ones in the future
-    complete.dat <- impu.mt[, -match(c(yvar, control.wells), colnames(impu.mt))]
+    complete.dat <- impu.mt[, -match(c(yvar, control.wells), colnames(impu.mt)),drop=FALSE]
     message("Running UMAP...")
     a <- Sys.time()
     umap.bkb.impuInf <- umap(
@@ -105,7 +104,8 @@ function(
     qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',] #up to 74
     col.coeff <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))[seq_len(n)]
     
-    jpeg(filename = file.path(paths["graph"], paste0("/ClusterStructure_UMAP_", length(bkb.v), "bkb_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)
+    FN <- paste0("ClusterStructure_UMAP_", length(bkb.v), "bkb_colPhenog_600x750.jpeg")
+    jpeg(filename = file.path(paths["graph"], FN), height = 600, width = 750, res = 80)
     p <- ggplot(
     data=graph.dat, mapping = aes(x=UMAP1, y=UMAP2, colour=Cluster)) + geom_point(size = 0.05, alpha = 0.25) + 
     labs(titles = paste0("Normalised ", length(bkb.v), "bkb. \n(", nrow(graph.dat), " cells)")) +
@@ -124,8 +124,9 @@ function(
     qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',]
     col.coeff <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))[seq_len(n)]
     
-    jpeg(filename = file.path(paths["graph"], paste0("/ClusterStructure_UMAP_", names(preds)[i], length(bkb.v), "bkb",
-    (ncol(complete.dat)-length(bkb.v)),"impuInf_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)
+    FN <- paste0("ClusterStructure_UMAP_", names(preds)[i], length(bkb.v), "bkb",
+    (ncol(complete.dat)-length(bkb.v)),"impuInf_colPhenog_600x750.jpeg")
+    jpeg(filename = file.path(paths["graph"], FN), height = 600, width = 750, res = 80)
     p <- ggplot(
     data=graph.dat, mapping = aes(x=UMAP1, y=UMAP2, colour=Cluster)) + geom_point(size = 0.05, alpha = 0.25) + 
     labs(titles = paste0(names(preds)[i], " ", length(bkb.v), "bkb. ", (ncol(complete.dat)-length(bkb.v)),"impuInf \n(", nrow(graph.dat), " cells)")) +

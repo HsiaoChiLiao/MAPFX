@@ -41,7 +41,7 @@ function(
     
     rawInten <- readRDS(file = file.path(paths["intermediary"], "fcs_rawInten_mt.rds"))
     metadata.cell <- readRDS(file = file.path(paths["intermediary"], "fcs_metadata_df.rds"))
-    sel.bkb.raw <- rawInten[,match(bkb.v, colnames(rawInten))]
+    sel.bkb.raw <- rawInten[,match(bkb.v, colnames(rawInten)),drop=FALSE]
     
     if(trans.dat == "cent.lgc"){
     ## lgc trans - borrowing inflow people
@@ -90,7 +90,7 @@ function(
     well.v <- unique(metadata.cell$Well.lab)
     shifted.ls <- list()
     for(i in seq_along(well.v)){
-    dat.here <- sel.bkb.lgc[which(metadata.cell$Well.lab == well.v[i]),]
+    dat.here <- sel.bkb.lgc[which(metadata.cell$Well.lab == well.v[i]),,drop=FALSE]
     dat.meanSF <- apply(dat.here, 2, function(x) (x-mean(x)))
     shifted.ls[[i]] <- dat.meanSF
     }
@@ -104,7 +104,7 @@ function(
     batch.v <- unique(metadata.cell$Batch)
     shifted.ls <- list()
     for(i in seq_along(batch.v)){
-    dat.here <- sel.bkb.lgc[which(metadata.cell$Batch == batch.v[i]),]
+    dat.here <- sel.bkb.lgc[which(metadata.cell$Batch == batch.v[i]),,drop=FALSE]
     dat.meanSF <- apply(dat.here, 2, function(x) (x-mean(x)))
     shifted.ls[[i]] <- dat.meanSF
     }
@@ -133,7 +133,7 @@ function(
     a <- Sys.time()
     umap.bkb.cent.lgc <- umap(
     sel.bkb.cent.lgc, 
-    n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000) #, n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000
+    n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000)
     b <- Sys.time()
     message(b-a) 
     saveRDS(umap.bkb.cent.lgc, file = file.path(paths["intermediary"], "initM_umap.bkb.cent.lgc.rds"))
@@ -153,7 +153,7 @@ function(
     colnames(graph.dat) <- c("UMAP1", "UMAP2", "Pheno.gp")
     
     n <- length(unique(graph.dat$Pheno.gp))
-    qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',]
+    qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',,drop=FALSE]
     col.coeff <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))[seq_len(n)]
     
     jpeg(filename = file.path(paths["graph"], "/", paste0(trans.dat, "_UMAP_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)

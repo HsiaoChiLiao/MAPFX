@@ -38,7 +38,7 @@ function(
     
     message("Cluster analysis for normalised backbone measurements...")
     message("Clustering with normalised backbones")
-    bkb.dat <- normalised.bkb[,match(bkb.v,colnames(normalised.bkb))]
+    bkb.dat <- normalised.bkb[,match(bkb.v,colnames(normalised.bkb)),drop=FALSE]
     message("Running UMAP...")
     a <- Sys.time()
     umap.bkb <- umap(bkb.dat, n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000)
@@ -68,7 +68,8 @@ function(
     qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',] #up to 74
     col.coeff <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))[seq_len(n)]
     
-    jpeg(filename = file.path(paths["graph"], paste0("/ClusterStructure_UMAP_", length(bkb.v), "bkb_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)
+    FN <- paste0("ClusterStructure_UMAP_", length(bkb.v), "bkb_colPhenog_600x750.jpeg")
+    jpeg(filename = file.path(paths["graph"], FN), height = 600, width = 750, res = 80)
     p <- ggplot(
     data=graph.dat, mapping = aes(x=UMAP1, y=UMAP2, colour=Cluster)) + geom_point(size = 0.05, alpha = 0.25) + 
     labs(titles = paste0("Normalised ", length(bkb.v), "bkb. \n(", nrow(graph.dat), " cells)")) +

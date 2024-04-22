@@ -78,11 +78,6 @@ function(
     saveRDS(runVignette_meta, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))
     saveRDS(runVignette_rawInten, file = file.path(paths["intermediary"], "/fcs_rawInten_mt.rds"))
     
-    ##omitting - 1.fcs to rds
-    #fcs_to_rds_bkb(
-    #paths=paths, file_meta=file_meta, MPC = FALSE)
-    
-    
     ##2-1.bkc protein
     message("\n\n\nBackground correcting proteins...")
     bkc_bkb_ffc(

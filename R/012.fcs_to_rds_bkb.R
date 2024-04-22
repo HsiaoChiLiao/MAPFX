@@ -26,7 +26,7 @@ function(
     ){
     ## re-make large mt and consider SSC and FSC
     # import fcs.impu.raw files ###
-    fs <- read.flowSet(path = file.path(paste0(paths["input"], "/fcs/")))
+    fs <- read.flowSet(path = file.path(paths["input"], "fcs"))
     name.desc.fs <- pData(parameters(fs[[1]]))
     name.desc.fs$desc[which(is.na(name.desc.fs$desc))] <- name.desc.fs$name[which(is.na(name.desc.fs$desc))]
     
@@ -84,10 +84,8 @@ function(
     }
     
     #ordering before giving NO.in.all
-    # unique(fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Well.lab),]
-    # unique(ord.fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Well.lab),]
+    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Well.lab),,drop=FALSE]
+    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Well.lab),,drop=FALSE]
     }
     
     if(file_meta == "usr"){
@@ -114,17 +112,15 @@ function(
     #use lapply for multiple changing class: lapply(mydf[,2:3], as.factor)
     
     #ordering before giving NO.in.all
-    # unique(fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Well.lab),]
-    # unique(ord.fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Well.lab),]
+    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Well.lab),,drop=FALSE]
+    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Well.lab),,drop=FALSE]
     }
     
     #global ID for each cell
     ord.fcs.raw.meta.df$NO.in.all <- seq_len(nrow(ord.fcs.raw.mt))
     
     #out rds
-    ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(8,1,3,5,6,4,7)]
+    ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(8,1,3,5,6,4,7),drop=FALSE]
     }
     
     if(MPC == FALSE & file_meta == "usr"){
@@ -147,16 +143,14 @@ function(
     #use lapply for multiple changing class: lapply(mydf[,2:3], as.factor)
     
     #ordering before giving NO.in.all
-    # unique(fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Batch),]
-    # unique(ord.fcs.raw.meta.df$Well.lab)
-    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Batch),]
+    ord.fcs.raw.meta.df <- fcs.raw.meta.df[order(fcs.raw.meta.df$Batch),,drop=FALSE]
+    ord.fcs.raw.mt <- fcs.raw.mt[order(fcs.raw.meta.df$Batch),,drop=FALSE]
     
     #global ID for each cell
     ord.fcs.raw.meta.df$NO.in.all <- seq_len(nrow(ord.fcs.raw.mt))
     
     #out rds
-    ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(4,1,3)]
+    ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(4,1,3),drop=FALSE]
     }else{
     stop("Please provide a `filename_meta.csv` file and set the argument file_meta == \"usr\"")
     }

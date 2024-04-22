@@ -35,12 +35,12 @@ function(
     
     rawInten <- readRDS(file = file.path(paths["intermediary"], "fcs_rawInten_mt.rds"))
     metadata.cell <- readRDS(file = file.path(paths["intermediary"], "fcs_metadata_df.rds"))
-    sel.bkb.raw <- rawInten[,match(bkb.v, colnames(rawInten))]
+    sel.bkb.raw <- rawInten[,match(bkb.v, colnames(rawInten)),drop=FALSE]
     
     ## functions for estimating parameters
     {
     # nlogl for mu and sig parameters of noise distribution
-    # xx = the observed intensity used for estimating mu and sig
+    # xx is the observed intensity used for estimating mu and sig
     # the lowest 1% of values will not be used to minimize the impact of outliers on sig
     nlogl.norm.v2 <- function(p, xx, n, rm.min.quantile = min.quantile){
     xx <- sort(xx)[-seq_len(round(n*rm.min.quantile))]
@@ -51,9 +51,8 @@ function(
     }
     
     #nlogl for alpha parameter of the true signal
-    # xx = the observed intensity used for estimating alpha
+    # xx is the observed intensity used for estimating alpha
     nlogl.exp <- function(p, xx, n){
-    # exp(p[1]) = 1/exponential mean = 1/alpha
     loglik <- sum(dexp(xx,rate=exp(p[1]),log=TRUE)) + 
     (n-length(xx))*pexp(min(xx),rate=exp(p[1]),log.p=TRUE)
     -loglik
@@ -114,11 +113,9 @@ function(
     error = function(e){NA})
     )
 
-    # exp(p[1]) = 1/exponential mean = 1/alpha
     alpha <- (1/exp(out.2$p))
     para.df$alpha[w] <- alpha
     }
-    # print(paste0('well=',w,',alpha=',round(alpha[length(alpha)],1)))
     }
     para.ls[[m]] <- para.df
     message('backbone: ',m)
@@ -159,7 +156,6 @@ function(
     for(i in seq_along(marker.nam)){
     jpeg(filename = file.path(paths["graph"], paste0("medpara_sub0.01.", marker.nam[i], "_para.", upper.quantile,"up.", lower.quantile,"lo_500x500.jpeg")), width = 500, height = 500, res = 80)
     #subsample for graphing
-    # set.seed(123)
     extr.cell <- sample(seq_len(nrow(calib.dat)), nrow(calib.dat)*0.01)
     #can consider str. samp in the future
     if(i %in% skip.phy.meas){

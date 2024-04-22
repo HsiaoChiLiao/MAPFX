@@ -8,8 +8,7 @@
 #' @author Hsiao-Chi Liao
 #' 
 #' @import ggplot2
-#' @import ggrepel
-#' @import ComplexHeatmap
+#' @importFrom ComplexHeatmap rowAnnotation draw Heatmap
 #' @importFrom Rfast lmfit colsums
 #' @importFrom RColorBrewer brewer.pal.info brewer.pal
 #' @importFrom circlize colorRamp2
@@ -44,7 +43,7 @@ function(
     lm.results.ls <- list()
     ln.sig.v <- c()
     res.df <- bkc.bkb
-    for(i in seq_along(bkc.bkb[1,])){ #1:ncol(bkc.bkb)
+    for(i in seq_along(bkc.bkb[1,])){
     
     yy.val <- as.matrix(bkc.bkb[,i])
     
@@ -52,8 +51,7 @@ function(
     lm.results.ls[[i]] <- lm.result
     res <- lm.result$residuals
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
-    # ln.sig.v[i] <- sd(lm.result$residuals)
-    
+
     res.df[,i] <- res
     
     message("Processing backbone: ", i)
@@ -70,14 +68,13 @@ function(
     b <- Sys.time()
     b-a
     message("\tEstimation completed!")
-    #Time difference of 13.76776 secs
     }
     ### adjusting data - subtracting unwanted effect ###
     {
     message("\tRemoving batch effect for backbone markers...")
     adj.data <- log.adj.data <- bkc.bkb
     a <- Sys.time()
-    for(i in seq_along(bkc.bkb[1,])){ #1:ncol(bkc.bkb)
+    for(i in seq_along(bkc.bkb[1,])){
     
     unwanted.eff <- (xx[,(2:length(unique(metadata.cell$Batch)))] %*% quant.bio.pcr.mt[(2:length(unique(metadata.cell$Batch))), i])
     
@@ -103,17 +100,15 @@ function(
     xx <- as.matrix(model.matrix(~ Batch + init.M, data = metadata.cell))
     
     adj.lm.results.ls <- list()
-    # glm.results.ls <- list()
     ln.sig.v <- c()
-    for(i in seq_along(log.adj.data[1,])){ #1:ncol(log.adj.data)
+    for(i in seq_along(log.adj.data[1,])){
     yy.val <- as.matrix(log.adj.data[,i])
     
     lm.result <- tryCatch(lmfit(x = xx, y = yy.val), error=function(err) NA)
     adj.lm.results.ls[[i]] <- lm.result
     res <- lm.result$residuals
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
-    # ln.sig.v[i] <- sd(lm.result$residuals)
-    
+
     message("Processing backbone: ", i)
     }
     
@@ -204,8 +199,6 @@ function(
     meta_mat <- data.frame(coeff=rownames(batch.dat))
     meta_mat$Coef <- "Batch"
     
-    # col. anno for heatmap (be careful of the position of each variable)
-    #display.brewer.pal(n = 8, name = 'Dark2')
     col.coeff <- c(brewer.pal(9,"Set1")[c(1,3,2)], brewer.pal(8,"Dark2")[c(4,1,3)])
     row_ha <- rowAnnotation(
     Effect=meta_mat[,'Coef'],

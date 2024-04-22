@@ -8,8 +8,7 @@
 #' @author Hsiao-Chi Liao
 #' 
 #' @import ggplot2
-#' @import ggrepel
-#' @import ComplexHeatmap
+#' @importFrom ComplexHeatmap rowAnnotation draw Heatmap
 #' @importFrom Rfast lmfit colsums
 #' @importFrom RColorBrewer brewer.pal.info brewer.pal
 #' @importFrom circlize colorRamp2
@@ -46,15 +45,14 @@ function(
     lm.results.ls <- list()
     ln.sig.v <- c()
     res.df <- bkc.bkb
-    for(i in seq_along(bkc.bkb[1,])){ #1:ncol(bkc.bkb)
+    for(i in seq_along(bkc.bkb[1,])){
     yy.val <- as.matrix(bkc.bkb[,i])
     
     lm.result <- tryCatch(lmfit(x = xx, y = log(yy.val+0.000001)), error=function(err) NA)
     lm.results.ls[[i]] <- lm.result
     res <- lm.result$residuals
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
-    # ln.sig.v[i] <- sd(lm.result$residuals)
-    
+
     res.df[,i] <- res
     
     message("Processing backbone: ", i)
@@ -71,14 +69,13 @@ function(
     b <- Sys.time()
     b-a
     message("\tEstimation completed!")
-    #Time difference of 13.76776 secs
     }
     ### adjusting data - subtracting unwanted effect ###
     {
     message("\tRemoving well effect for backbone markers...")
     adj.data <- log.adj.data <- bkc.bkb
     a <- Sys.time()
-    for(i in seq_along(bkc.bkb[1,])){ #1:ncol(bkc.bkb)
+    for(i in seq_along(bkc.bkb[1,])){
     unwanted.eff <- (xx[,(2:21)] %*% quant.bio.pcr.mt[(2:21), i])
     
     log.adj.data[,i] <- (log(bkc.bkb[,i]+0.000001) - unwanted.eff) #as the coef was estimated from data on log scale
@@ -105,17 +102,15 @@ function(
     xx <- as.matrix(model.matrix(~ Plate + Column + Row + init.M, data = metadata.cell))
     
     adj.lm.results.ls <- list()
-    # glm.results.ls <- list()
     ln.sig.v <- c()
-    for(i in seq_along(log.adj.data[1,])){ #1:ncol(log.adj.data)
+    for(i in seq_along(log.adj.data[1,])){
     yy.val <- as.matrix(log.adj.data[,i])
     
     lm.result <- tryCatch(lmfit(x = xx, y = yy.val), error=function(err) NA)
     adj.lm.results.ls[[i]] <- lm.result
     res <- lm.result$residuals
     ln.sig.v[i] <- sqrt(sum( (res - mean(res) )^2 )/(length(res)-length(lm.results.ls[[1]]$be))) #coef used
-    # ln.sig.v[i] <- sd(lm.result$residuals)
-    
+
     message("Processing backbone: ", i)
     }
     
@@ -128,7 +123,6 @@ function(
     }
     b <- Sys.time()
     b-a
-    #Time difference of 10.95444 secs
     }
     
     ### rmWellEffect_bkb_visualisation (heatmap) - bio and pcr effects ###
@@ -136,18 +130,18 @@ function(
     {
     #adjust y the num. one
     #no intercept and sigma
-    in.dat <- list(quant.bio.pcr.mt[-c(1,nrow(quant.bio.pcr.mt)),], adj.quant.bio.pcr.mt[-c(1,nrow(adj.quant.bio.pcr.mt)),])
+    in.dat <- list(quant.bio.pcr.mt[-c(1,nrow(quant.bio.pcr.mt)),,drop=FALSE], adj.quant.bio.pcr.mt[-c(1,nrow(adj.quant.bio.pcr.mt)),,drop=FALSE])
     in.dat <- list(
     rbind(
-    in.dat[[1]][seq_len(2),], Plate3 = -colsums(in.dat[[1]][seq_len(2),]),
-    in.dat[[1]][3:13,], Column12 = -colsums(in.dat[[1]][3:13,]),
-    in.dat[[1]][14:20,], Row8 = -colsums(in.dat[[1]][14:20,]),
-    in.dat[[1]][21:nrow(in.dat[[1]]),], init.Mlast = -colsums(in.dat[[1]][21:nrow(in.dat[[1]]),])),
+    in.dat[[1]][seq_len(2),,drop=FALSE], Plate3 = -colsums(in.dat[[1]][seq_len(2),,drop=FALSE]),
+    in.dat[[1]][3:13,,drop=FALSE], Column12 = -colsums(in.dat[[1]][3:13,,drop=FALSE]),
+    in.dat[[1]][14:20,,drop=FALSE], Row8 = -colsums(in.dat[[1]][14:20,,drop=FALSE]),
+    in.dat[[1]][21:nrow(in.dat[[1]]),,drop=FALSE], init.Mlast = -colsums(in.dat[[1]][21:nrow(in.dat[[1]]),,drop=FALSE])),
     rbind(
-    in.dat[[2]][seq_len(2),], Plate3 = -colsums(in.dat[[2]][seq_len(2),]),
-    in.dat[[2]][3:13,], Column12 = -colsums(in.dat[[2]][3:13,]),
-    in.dat[[2]][14:20,], Row8 = -colsums(in.dat[[2]][14:20,]),
-    in.dat[[2]][21:nrow(in.dat[[2]]),], init.Mlast = -colsums(in.dat[[2]][21:nrow(in.dat[[2]]),]))
+    in.dat[[2]][seq_len(2),,drop=FALSE], Plate3 = -colsums(in.dat[[2]][seq_len(2),,drop=FALSE]),
+    in.dat[[2]][3:13,,drop=FALSE], Column12 = -colsums(in.dat[[2]][3:13,,drop=FALSE]),
+    in.dat[[2]][14:20,,drop=FALSE], Row8 = -colsums(in.dat[[2]][14:20,,drop=FALSE]),
+    in.dat[[2]][21:nrow(in.dat[[2]]),,drop=FALSE], init.Mlast = -colsums(in.dat[[2]][21:nrow(in.dat[[2]]),,drop=FALSE]))
     )
     rownames(in.dat[[1]])[length(rownames(in.dat[[1]]))] <- paste0("init.M", (length(24:nrow(in.dat[[1]]))))
     rownames(in.dat[[2]])[length(rownames(in.dat[[2]]))] <- paste0("init.M", (length(24:nrow(in.dat[[2]]))))
@@ -164,7 +158,7 @@ function(
     dat0 <- in.dat[[i]]
     
     if(j == 1){ #biology
-    bio.dat <- dat0[-seq_len(23),]
+    bio.dat <- dat0[-seq_len(23),,drop=FALSE]
     # metadata
     meta_mat <- data.frame(coeff=rownames(bio.dat))
     meta_mat$Coef <- factor(
@@ -203,7 +197,7 @@ function(
     )
     dev.off()
     }else{
-    well.dat <- dat0[(seq_len(23)),]
+    well.dat <- dat0[(seq_len(23)),,drop=FALSE]
     # metadata
     meta_mat <- data.frame(coeff=rownames(well.dat))
     meta_mat$Coef <- factor(c(
@@ -211,7 +205,6 @@ function(
     levels = c('logn.mu.Plate', 'logn.mu.Column', 'logn.mu.Row'))
     
     # col. anno for heatmap (be careful of the position of each variable)
-    #display.brewer.pal(n = 8, name = 'Dark2')
     col.coeff <- c(brewer.pal(9,"Set1")[c(1,3,2)], brewer.pal(8,"Dark2")[c(4,1,3)])
     row_ha <- rowAnnotation(
     Effect=meta_mat[,'Coef'],

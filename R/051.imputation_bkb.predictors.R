@@ -14,25 +14,21 @@
 #' 
 #' @author Hsiao-Chi Liao and InfinityFlow (Becht et. al, 2021)
 #'
-#' @import glmnetUtils
-#' @import e1071
-#' @import xgboost
-#' @import foreach
-#' @import doParallel
-#' @importFrom stats lm predict
-#' @importFrom utils getS3method
-#' @importFrom parallel makeCluster clusterExport clusterEvalQ stopCluster
+#' @importFrom glmnetUtils cv.glmnet
+#' @importFrom e1071 svm
+#' @importFrom xgboost xgboost xgb.Booster.complete xgb.parameters<-
+#' @importFrom stats lm predict as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames formula
+#' @importFrom utils getS3method head read.csv
+#' @importFrom parallel makeCluster clusterExport clusterEvalQ stopCluster mc.reset.stream
 #' @importFrom pbapply pblapply
 #' @import ggplot2
-#' @import cowplot
+#' @importFrom cowplot plot_grid
 #' @importFrom reshape2 melt
 #' @importFrom gtools combinations
 #' 
 #' @importFrom grDevices dev.off jpeg
 #' @importFrom graphics abline
 #' @importFrom methods is
-#' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
-#' @importFrom utils head read.csv
 #'
 #' @return Imputing the unmeasured well-specific markers and save to predictions.Rds file. Visualising the result with the boxplots (r-sq).
 #'
@@ -242,7 +238,6 @@ function(
     d.e <- lapply( # add another column: train_set~ 0: testing, 1: training
     d.e,
     function(x){
-    # set.seed(123)
     w <- sample(rep(c(TRUE,FALSE),times=c(floor(nrow(x)/2),nrow(x)-floor(nrow(x)/2))))
     x <- cbind(x,train_set=ifelse(w,1,0))
     x
@@ -269,7 +264,6 @@ function(
     # [3,]         1
     }
     
-    ## not sure what these used for... about parallel computing??
     {
     clusterExport(
     cl,
@@ -325,14 +319,14 @@ function(
     xp <- xp[, chans]
     
     requireNamespace("parallel")
-    cl <- parallel::makeCluster(cores)
+    cl <- makeCluster(cores)
     
     ## OS related
     {
     if(.Platform$OS.type == "windows") {
     mc.reset.stream <- function() return(invisible(NULL))
     } else {
-    mc.reset.stream <- parallel::mc.reset.stream
+    mc.reset.stream <- mc.reset.stream
     }
     mc.reset.stream()
     
@@ -394,7 +388,6 @@ function(
     t0 <- Sys.time()
     preds[[i]] <- do.call( #length of list depends on types of models assigned by user
     cbind,
-    ##parLapplyLB(
     pblapply(
     cl=cl,# no. core
     X=models[[i]], # used model
@@ -481,7 +474,6 @@ function(
     t0 <- Sys.time()
     preds[[i]] <- do.call( #length of list depends on types of models assigned by user
     cbind,
-    ##parLapplyLB(
     pblapply(
     cl=cl,# no. core
     X=models[[i]], # used model
@@ -566,7 +558,6 @@ function(
     t0 <- Sys.time()
     preds[[i]] <- do.call( #length of list depends on types of models assigned by user
     cbind,
-    ##parLapplyLB(
     pblapply(
     cl=cl,# no. core
     X=models[[i]], # used model
@@ -675,11 +666,6 @@ function(
     plot.subtitle = element_text(size=16),
     axis.text=element_text(size=14, face = "bold"),
     axis.title=element_text(size=18,face="bold"),
-    # legend.key.size = unit(1, 'cm'), #change legend key size
-    # legend.key.height = unit(1, 'cm'), #change legend key height
-    # legend.key.width = unit(1, 'cm'), #change legend key width
-    # legend.title = element_text(size=10, face="bold"), #change legend title font size
-    # legend.text = element_text(size=8, face="bold")
     )
     plot(p)
     dev.off()

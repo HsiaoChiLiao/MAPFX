@@ -13,7 +13,7 @@
 #' @importFrom graphics abline
 #' @importFrom methods is
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
-#' @importFrom utils head read.csv
+#' @importFrom utils head read.csv write.csv
 #' 
 #' @return Generating the calibrated measurements and save to bkc.pe_mt.rds file. Visualising the result with the scatter plots.
 #' 
@@ -24,23 +24,19 @@ function(
     pe.min.quantile=0.01, #the lowest 1% of values will not be used to minimize the impact of outliers on sig
     plots
     ){
-    # pe.mean.sd=3, #mean+-3sd for extracting extremely large values
-    
     ## for later use!
     min.quantile <- pe.min.quantile
     lower.quantile <- pe.lower.quantile
     
-    #consider this in the future
-    # upper.quantile=0.9, #cells used for estimating parameter of signal
-    
     rawInten <- readRDS(file = file.path(paths["intermediary"], "fcs_rawInten_mt.rds"))
     metadata.cell <- readRDS(file = file.path(paths["intermediary"], "fcs_metadata_df.rds"))
-    pe.raw <- as.matrix(rawInten[,"Legend"]); colnames(pe.raw) <- "Legend"
+    pe.raw <- as.matrix(rawInten[,"Legend"])
+    colnames(pe.raw) <- "Legend"
     
     ## functions for estimating parameters
     {
     # nlogl for mu and sig parameters of noise distribution
-    # xx = the observed intensity used for estimating mu and sig
+    # xx is the observed intensity used for estimating mu and sig
     # the lowest 1% of values will not be used to minimize the impact of outliers on sig
     nlogl.norm.v2 <- function(p, xx, n, rm.min.quantile = min.quantile){
     xx <- sort(xx)[-seq_len(round(n*rm.min.quantile))]
@@ -51,7 +47,7 @@ function(
     }
     
     #nlogl for alpha parameter of the true signal
-    # xx = the observed intensity used for estimating alpha
+    # xx is the observed intensity used for estimating alpha
     nlogl.exp <- function(p, xx, n) {
     # exp(p[1]) = 1/exponential mean = 1/alpha
     loglik <- sum(dexp(xx,rate=exp(p[1]),log=TRUE)) + (n-length(xx))*pexp(min(xx),rate=exp(p[1]),log.p=TRUE)
@@ -75,7 +71,7 @@ function(
     samp.alpha <- c()
     criteria.alpha <- c()
     few.cell.well.ls <- list()
-    for(i in seq_along(para.df[,1])){ #1:nrow(para.df)
+    for(i in seq_along(para.df[,1])){ 
     well.here <- para.df$Well.lab[i]
     dat.here <- as.matrix(pe.raw[which(metadata.cell$Well.lab == well.here),1])
     
@@ -126,7 +122,6 @@ function(
     error = function(e){NA})
     )
     
-    # exp(p[1]) = 1/exponential mean = 1/alpha
     alpha <- (1/exp(out.2$p))
     para.df$alpha[i] <- alpha
     
@@ -135,9 +130,12 @@ function(
     calib.dat[,1] <- calib(dat.here, alpha, mle.mean, sig.2 = mle.sd^2)
     calib.dat.ls[[i]] <- calib.dat
     
-    # print(paste0('Iteration=',i,', alpha=',round(alpha[length(alpha)],1)))
     }
-    message("Could not find enough cells (>=10) when used \"mle.mean+3*mle.sd\", so estimated alpha with the \"largest 10\" cells:\n", cat(do.call(c, few.cell.well.ls), sep=", "))
+    message("Could not find enough cells (>=10) when used \"mle.mean+3*mle.sd\", so estimated alpha with the top 10 cells with \"the largest values\":\n", length(do.call(c, few.cell.well.ls)), " wells applied this strategy\nSee Wellname_largest10.csv in the intermediary directory for details.")
+    out_largest10 <- data.frame(do.call(c, few.cell.well.ls))
+    colnames(out_largest10) <- "Well"
+    write.csv(out_largest10, file = file.path(paths["intermediary"], "Wellname_largest10.csv"))
+    
     para.df <- cbind(para.df, samp.alpha, criteria.alpha)
     saveRDS(para.df, file = file.path(paths["intermediary"], "para.266pe.rds"))
     

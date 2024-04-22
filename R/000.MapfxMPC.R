@@ -120,10 +120,7 @@ function(
     saveRDS(runVignette_meta, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))
     saveRDS(runVignette_rawInten, file = file.path(paths["intermediary"], "/fcs_rawInten_mt.rds"))
     
-    ##omitting - 1.fcs to rds
-    # fcs_to_rds(paths=paths, file_meta=file_meta, yvar = yvar)
-    
-    
+
     ##2-1.bkc bkb
     message("\n\n\nBackground correcting backbone markers...")
     bkc_bkb(
@@ -209,18 +206,6 @@ function(
     
     chans <- bkb.v
     
-    ## Making sure that optional dependencies are installed if used. 
-    # lapply(
-    #   regression_functions,
-    #   function(fun){
-    #     fun(x = NULL, params = NULL)
-    #   }
-    # )
-    
-    # if(length(extra_args_regression_params) != length(regression_functions)){
-    #   stop("extra_args_regression_params and regression_functions should be lists of the same lengths")
-    # }
-    
     if(length(extra_args_regression_params) != length(models.use)){
     stop("'extra_args_regression_params' and 'models.use' should be lists of the same lengths")
     }
@@ -298,15 +283,6 @@ function(
     plots = plots.cluster.analysis.all)
     }
     }
-    
-    # ##7.cluster analysis bkbOnly (no need for if used 6.)
-    # message("\n\n\nCluster analysis with adjusted backbone markers...")
-    # if(cluster.analysis.bkb == TRUE){
-    # cluster.analysis.bkbOnly(
-    # paths=paths,
-    # bkb.v=bkb.v,
-    # plots = plots.cluster.analysis.bkb)
-    # }
     
     message("\tCompleted!")
     

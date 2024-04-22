@@ -56,4 +56,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
 .DS_Store
+
+.git/.DS_Store
+
