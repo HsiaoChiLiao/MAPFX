@@ -39,7 +39,7 @@ MapfxMPC_impu_obj <- MapfxMPC(
    plots.imputation = TRUE,
    cluster.analysis.bkb = TRUE, plots.cluster.analysis.bkb = TRUE,
    cluster.analysis.all = TRUE, plots.cluster.analysis.all = TRUE,
-   cores = 4L)
+   cores = 2L)
 
 test_that("MapfxMPC returns an object", {
   obj <- MapfxMPC_impu_obj
@@ -92,7 +92,7 @@ MapfxMPC_NOimpu_obj <- MapfxMPC(
   plots.imputation = FALSE,
   cluster.analysis.bkb = FALSE, plots.cluster.analysis.bkb = FALSE,
   cluster.analysis.all = FALSE, plots.cluster.analysis.all = FALSE,
-  cores = 4L)
+  cores = 2L)
 
 test_that("MapfxMPC returns an object", {
   obj <- MapfxMPC_NOimpu_obj

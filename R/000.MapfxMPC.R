@@ -86,7 +86,7 @@
 #'   plots.imputation = TRUE,
 #'   cluster.analysis.bkb = TRUE, plots.cluster.analysis.bkb = TRUE,
 #'   cluster.analysis.all = TRUE, plots.cluster.analysis.all = TRUE,
-#'   cores = 4L)
+#'   cores = 2L)
 #' 
 #' 
 MapfxMPC <-
