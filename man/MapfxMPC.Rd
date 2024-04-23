@@ -109,7 +109,7 @@ In the output directory, this function produces the normalised backbone measurem
 data(ord.fcs.raw.meta.df.out_mpc)
 data(ord.fcs.raw.mt_mpc)
 
-# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+# create an Output directory for the MapfxMPC function
 dir.create(file.path(tempdir(), "MPC_impu_Output"))
 
 # When `impute = TRUE`, randomly selecting 50\% of the cells in each well for model training

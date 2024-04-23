@@ -33,7 +33,7 @@
 #' data(ord.fcs.raw.meta.df.out_ffc)
 #' data(ord.fcs.raw.mt_ffc)
 #' 
-#' # create an Output directory in the current working directory for the argument 'Outpath' of the MapfxFFC function
+#' # create an Output directory for the MapfxFFC function
 #' dir.create(file.path(tempdir(), "FFCnorm_Output"))
 #' 
 #' MapfxFFC_obj <- MapfxFFC(
