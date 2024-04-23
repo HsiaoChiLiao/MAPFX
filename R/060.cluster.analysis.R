@@ -22,7 +22,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset. Visualising the result with the scatter plots.
+#' @return Metadata for cells with group labels from the cluster analysis
+#' 
+#' @details
+#' Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset, and visualising the result with the scatter plots in the output directory.
 #' 
 cluster.analysis <-
 function(
@@ -47,19 +50,13 @@ function(
     message("Clustering with normalised backbones")
     bkb.dat <- impu.mt[, match(names(bkb.v), colnames(impu.mt)),drop=FALSE]
     message("Running UMAP...")
-    a <- Sys.time()
     umap.bkb <- umap(
     bkb.dat,
     n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000)
-    b <- Sys.time()
-    b-a
     saveRDS(umap.bkb, file = file.path(paths["downstream"], paste0("ClusterAnalysis_", "umap_",length(bkb.v),"bkb.rds")))
     
     message("Running Phenograph...")
-    a <- Sys.time()
     phenog.bkb <- Rphenograph(bkb.dat, k = 50)  #knn_fun = "hnsw", 
-    b <- Sys.time()
-    b-a #5.802254 mins
     saveRDS(phenog.bkb, file = file.path(paths["intermediary"], paste0("ClusterAnalysis_", "phenog_",length(bkb.v),"bkb.rds")))
     }
     
@@ -67,21 +64,15 @@ function(
     message("Clustering with normalised backbones + imputed infinity markers (", names(preds)[i], ")") #now: use them all - may just pick good ones in the future
     complete.dat <- impu.mt[, -match(c(yvar, control.wells), colnames(impu.mt)),drop=FALSE]
     message("Running UMAP...")
-    a <- Sys.time()
     umap.bkb.impuInf <- umap(
     complete.dat,
     n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000)
-    b <- Sys.time()
-    b-a #11.9143 mins
     saveRDS(umap.bkb.impuInf, 
     file = file.path(paths["downstream"], paste0("ClusterAnalysis_", names(preds)[i], "_umap_", 
     length(bkb.v),"bkb.", (ncol(complete.dat)-length(bkb.v)),"impuInf.rds")))
     
     message("Running Phenograph...")
-    a <- Sys.time()
     phenog.bkb.impuInf <- Rphenograph(complete.dat, k = 50)  #knn_fun = "hnsw", 
-    b <- Sys.time()
-    b-a #17.67467 mins
     saveRDS(phenog.bkb.impuInf, 
     file = file.path(paths["intermediary"], paste0("ClusterAnalysis_", names(preds)[i], "_phenog_",
     length(bkb.v),"bkb.", (ncol(complete.dat)-length(bkb.v)),"impuInf.rds")))
@@ -139,9 +130,10 @@ function(
     }
     }
     ###
-    head(metadata.cell)
     saveRDS(metadata.cell, file = file.path(paths["downstream"], "fcs_metadata_df.rds"))
     
     message("\tCompleted!")
+    
+    return(metadata.cell)
     }
     

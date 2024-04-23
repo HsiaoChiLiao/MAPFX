@@ -4,7 +4,7 @@
 \alias{bkc_pe}
 \title{Background correction for the well-specific markers (PE)}
 \usage{
-bkc_pe(paths, pe.lower.quantile = 0.1, pe.min.quantile = 0.01, plots)
+bkc_pe(paths, pe.lower.quantile = 0.1, pe.min.quantile = 0.01, plots = TRUE)
 }
 \arguments{
 \item{paths}{a vector of characters of paths to store intput, intermediary results, outputs...}
@@ -16,10 +16,13 @@ bkc_pe(paths, pe.lower.quantile = 0.1, pe.min.quantile = 0.01, plots)
 \item{plots}{logical; if TRUE (default), produce scatter plots for pre- and post- background adjusted infinity markers (calibrated values on y-axis and raw values on x-axis).}
 }
 \value{
-Generating the calibrated measurements and save to bkc.pe_mt.rds file. Visualising the result with the scatter plots.
+Background noise corrected infinity markers and graphs if specified
 }
 \description{
 This function has been designed to do background correction for the well-specific markers (PE) by using normal-exponential convolution model.
+}
+\details{
+Generating the calibrated measurements and save to bkc.pe_mt.rds file, and visualising the result with the scatter plots in the output directory.
 }
 \author{
 Hsiao-Chi Liao and Agus Salim

@@ -4,32 +4,37 @@
 \alias{MapfxMPC}
 \title{MAssively Parallel Flow cytometry Xplorer (MAPFX)}
 \usage{
-MapfxMPC(runVignette = FALSE,
-         runVignette_meta = NULL,
-         runVignette_rawInten = NULL,
-         FCSpath,
-         Outpath,
-         file_meta = "auto",
-         bkb.v,
-         yvar = "Legend", 
-         control.wells,
-         bkb.upper.quantile = 0.9, 
-         bkb.lower.quantile = 0.1, 
-         bkb.min.quantile = 0.01,
-         inf.lower.quantile = 0.1, 
-         inf.min.quantile = 0.01, 
-         plots.bkc.bkb = TRUE, plots.bkc.inf = TRUE, 
-         plots.initM = TRUE,
-         plots.rmWellEffect = TRUE,
-         impute = TRUE,
-         models.use = c("XGBoost"),
-         extra_args_regression_params = list(list(nrounds = 1500, eta = 0.03)),
-         prediction_events_downsampling = NULL,
-         impu.training = FALSE,
-         plots.imputation = TRUE,
-         cluster.analysis.bkb = TRUE, plots.cluster.analysis.bkb = TRUE,
-         cluster.analysis.all = TRUE, plots.cluster.analysis.all = TRUE,
-         cores = 4L)
+MapfxMPC(
+  runVignette = FALSE,
+  runVignette_meta = NULL,
+  runVignette_rawInten = NULL,
+  FCSpath = NULL,
+  Outpath = NULL,
+  file_meta = "auto",
+  bkb.v = NULL,
+  yvar = "Legend",
+  control.wells = NULL,
+  bkb.upper.quantile = 0.9,
+  bkb.lower.quantile = 0.1,
+  bkb.min.quantile = 0.01,
+  inf.lower.quantile = 0.1,
+  inf.min.quantile = 0.01,
+  plots.bkc.bkb = TRUE,
+  plots.bkc.inf = TRUE,
+  plots.initM = TRUE,
+  plots.rmWellEffect = TRUE,
+  impute = TRUE,
+  models.use = c("XGBoost"),
+  extra_args_regression_params = list(list(nrounds = 1500, eta = 0.03)),
+  prediction_events_downsampling = NULL,
+  impu.training = FALSE,
+  plots.imputation = TRUE,
+  cluster.analysis.bkb = TRUE,
+  plots.cluster.analysis.bkb = TRUE,
+  cluster.analysis.all = TRUE,
+  plots.cluster.analysis.all = TRUE,
+  cores = 4L
+)
 }
 \arguments{
 \item{runVignette}{logical; if FALSE (default), specify a path to \code{FCSpath} argument; TRUE for running Vignette using built-in data.}
@@ -42,7 +47,7 @@ MapfxMPC(runVignette = FALSE,
 
 \item{Outpath}{path to the output directory where intermediate results and final results will be stored.}
 
-\item{file_meta}{if the file names of the FCS files are in the specified format, set \code{file_meta = "auto"}; otherwise set \code{file_meta="usr"} and provide a \code{filename_meta.csv} file in \verb{FCSpath/FCS/meta/}.}
+\item{file_meta}{if the file names of the FCS files are in the specified format, set \code{file_meta = "auto"}; otherwise set \code{file_meta = "usr"} and provide a \code{filename_meta.csv} file in \verb{FCSpath/FCS/meta/}.}
 
 \item{bkb.v}{a vector of the names of the backbone markers (MUST be the same as the names in the FCS files). For example, \code{bkb.v = c("FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", "CD4", "CD44", "CD8", "CD11c", "CD11b", "F480", "Ly6C", "Lineage", "CD45a488", "CD24", "CD103")}.}
 
@@ -80,26 +85,70 @@ MapfxMPC(runVignette = FALSE,
 
 \item{plots.imputation}{logical; if TRUE (default), visualise the distribution of R-sq values of infinity markers.}
 
-\item{cluster.analysis.bkb}{logical; if TRUE (default), perform cluster analysis using normalised backbone markers.}
+\item{cluster.analysis.bkb}{logical; if TRUE (default), perform cluster analysis using normalised backbone markers for all cells.}
 
-\item{plots.cluster.analysis.bkb}{logical; if TRUE (default), produce an UMAP embedding plot from the normalised backbone markers to visualise the structure of the biological clusters.}
+\item{plots.cluster.analysis.bkb}{logical; if TRUE (default), produce an UMAP embedding plot from the normalised backbone markers to visualise the structure of the biological clusters for all cells.}
 
-\item{cluster.analysis.all}{logical; if TRUE (default), perform cluster analysis using normalised backbone markers and imputed infinity markers.}
+\item{cluster.analysis.all}{logical; must set \code{FALSE} if \code{impute = FALSE}; if TRUE (default), perform cluster analysis using normalised backbone markers and imputed infinity markers for cells in testing set.}
 
-\item{plots.cluster.analysis.all}{logical; if TRUE (default), produce an UMAP embedding plot from the normalised backbone markers and the imputed infinity markers to visualise the structure of the biological clusters.}
+\item{plots.cluster.analysis.all}{logical; must set \code{FALSE} if \code{impute = FALSE}; if TRUE (default), produce an UMAP embedding plot from the normalised backbone markers and the imputed infinity markers to visualise the structure of the biological clusters for cells in testing set.}
 
 \item{cores}{the number of cores used to perform parallel computation during the imputation process (default = 4L).}
 }
 \value{
-Normalised backbone measurements and imputed well-specific markers. Cluster analysis for both normalised backbones and the completed dataset. Graphs will be provided if specified.
+Normalised backbone markers on log scale, background noise corrected infinity markers, imputations, and metadata for cells
 }
 \description{
 This function is an end-to-end toolbox for analysing single-cell protein intensity data from the Massively-Parallel Cytometry (MPC) Experiments in FCS format. The functions include data normalisation, imputation (using backbone markers), and cluster analysis.
 }
+\details{
+In the output directory, this function produces the normalised backbone measurements, the background corrected infinity measurements, and imputed infinity markers (if set impute = TRUE), cell group labels from the cluster analysis using both normalised backbones and the completed dataset (if impute = TRUE), and graphs will be provided if specified.
+}
 \examples{
-# when impute = TRUE, randomly selecting 50\% of the cells in each well for model training
-set.seed(123)
-MapfxMPC()
+# import built-in data
+data(ord.fcs.raw.meta.df.out_mpc)
+data(ord.fcs.raw.mt_mpc)
+
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+dir.create(file.path(tempdir(), "MPC_impu_Output"))
+
+# When `impute = TRUE`, randomly selecting 50\% of the cells in each well for model training
+set.seed(123) 
+MapfxMPC_impu_obj <- MapfxMPC(
+  runVignette = TRUE, #set FALSE if not running this example
+  runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this example
+  runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this example
+  FCSpath = NULL, # users specify their own input path if not running this example
+  Outpath = file.path(tempdir(), "MPC_impu_Output"),
+  file_meta = "auto",
+  bkb.v = c(
+    "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
+    "CD4", "CD44", "CD8", "CD11c", "CD11b", "F480", 
+    "Ly6C", "Lineage", "CD45a488", "CD24", "CD103"),
+  yvar = "Legend", 
+  control.wells = c(
+    "P1_A01", "P2_A01", "P3_A01",
+    "P3_F04", "P3_F05", "P3_F06", "P3_F07", "P3_F08", 
+    "P3_F09", "P3_F10", "P3_F11", "P3_F12",
+    "P3_G01", "P3_G02"),
+  bkb.upper.quantile = 0.9, 
+  bkb.lower.quantile = 0.1, 
+  bkb.min.quantile = 0.01,
+  inf.lower.quantile = 0.1, 
+  inf.min.quantile = 0.01, 
+  plots.bkc.bkb = TRUE, plots.bkc.inf = TRUE, 
+  plots.initM = TRUE,
+  plots.rmWellEffect = TRUE,
+  impute = TRUE,
+  models.use = c("XGBoost"),
+  extra_args_regression_params = list(list(nrounds = 1500, eta = 0.03)),
+  prediction_events_downsampling = NULL,
+  impu.training = FALSE,
+  plots.imputation = TRUE,
+  cluster.analysis.bkb = TRUE, plots.cluster.analysis.bkb = TRUE,
+  cluster.analysis.all = TRUE, plots.cluster.analysis.all = TRUE,
+  cores = 4L)
+
 
 }
 \author{

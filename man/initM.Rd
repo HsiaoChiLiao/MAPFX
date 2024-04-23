@@ -16,13 +16,15 @@ initM(paths, assay, bkb.v, plots = TRUE)
 \item{plots}{logical; if TRUE (default), produce a UMAP embedding plot to visualise the structure of the biological clusters to form the initial M matrix for removal of well effect.}
 }
 \value{
-Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the initial biological clusters. Visualising the result with the scatter plots.
+Metadata for cells with the initial biological clusters labels added
 }
 \description{
 Generating the M matrix for removing well effects.
 }
 \details{
 This function has been designed to find initial biological clusters with centred transformed data.
+
+Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the initial biological clusters, and visualising the result with the scatter plots in the output directory.
 }
 \author{
 Hsiao-Chi Liao

@@ -4,6 +4,7 @@
 #' 
 #' @param paths a vector of characters of paths to store intput, intermediary results, outputs...
 #' @param bkb.v a vector of the names of the backbone markers (MUST match to the names in the FCS file).
+#' @param MPC if the data is from MPC experiments, set `MPC = TRUE`. Setting FALSE represents data from the fluorescence flow cytometry (FFC) assay.
 #' @param bkb.upper.quantile the cut-off (default = 0.9) for selecting cells used for estimating the parameter of signal.
 #' @param bkb.lower.quantile the cut-off (default = 0.1) for selecting cells used for estimating the parameters of noise.
 #' @param bkb.min.quantile the cut-off (default = 0.01) for omitting the cells with the smallest values to minimise the impact of outliers.
@@ -17,16 +18,20 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Generating the calibrated measurements and save to medpara_bkc.bkb_no.bkcPhy_mt.rds file. Visualising the result with the scatter plots.
+#' @return Background noise corrected backbone markers and graphs if specified
+#' 
+#' @details
+#' Generating the calibrated measurements and save to medpara_bkc.bkb_no.bkcPhy_mt.rds file, and visualising the result with the scatter plots in the output directory.
 #' 
 bkc_bkb <-
 function(
     paths,
     bkb.v,
+    MPC,
     bkb.upper.quantile=0.9, #cells used for estimating parameter of signal
     bkb.lower.quantile=0.1, #cells used for estimating parameters of noise
     bkb.min.quantile=0.01, #the lowest 1% of values will not be used to minimise the impact of outliers on sig
-    plots
+    plots=TRUE
     ){
     ## for later use!
     upper.quantile <- bkb.upper.quantile
@@ -72,9 +77,17 @@ function(
     message("\tEstimating parameters for calibration...")
     para.ls <- list()
     for(m in seq_len(length(bkb.v))){
-    para.df <- data.frame(Well.lab = unique(metadata.cell$Well.lab), mu = NA, sig = NA, alpha = NA)
-    for(w in seq_len(length(unique(metadata.cell$Well.lab)))){
-    dat.here <- sel.bkb.raw[which(metadata.cell$Well.lab == para.df$Well.lab[w]), m]
+    if(MPC == TRUE){
+    para.df <- data.frame(Unwanted = unique(metadata.cell$Well.lab), mu = NA, sig = NA, alpha = NA)
+    }else{
+    para.df <- data.frame(Unwanted = unique(metadata.cell$Batch), mu = NA, sig = NA, alpha = NA)
+    }
+    for(w in seq_len(length(para.df$Unwanted))){
+    if(MPC == TRUE){
+    dat.here <- sel.bkb.raw[which(metadata.cell$Well.lab == para.df$Unwanted[w]), m]
+    }else{
+    dat.here <- sel.bkb.raw[which(metadata.cell$Batch == para.df$Unwanted[w]), m]
+    }
     ordering.bkb <- dat.here[order(dat.here)] #for finding quantiles
     
     ## estimate mean and sd of noise (10% smallest values)
@@ -121,7 +134,11 @@ function(
     message('backbone: ',m)
     }
     names(para.ls) <- colnames(sel.bkb.raw)
+    if(MPC == TRUE){
     saveRDS(para.ls, file = file.path(paths["intermediary"], paste0("para.ls_",ncol(sel.bkb.raw),"bkb_",length(unique(metadata.cell$Well.lab)),"well.rds")))
+    }else{
+    saveRDS(para.ls, file = file.path(paths["intermediary"], paste0("para.ls_",ncol(sel.bkb.raw),"bkb_",length(unique(metadata.cell$Batch)),"batch.rds")))
+    }
     message("\tEstimation of parameters... Completed!")
     }
     
@@ -139,13 +156,16 @@ function(
     med.alpha <- med.para[3]
     
     calib.temp <- list()
-    for(w in seq_len(length(unique(metadata.cell$Well.lab)))){
-    dat.here <- sel.bkb.raw[which(metadata.cell$Well.lab == para.df$Well.lab[w]), m]
-    
+    for(w in seq_len(length(para.df$Unwanted))){
+    if(MPC == TRUE){
+    dat.here <- sel.bkb.raw[which(metadata.cell$Well.lab == para.df$Unwanted[w]), m]
+    }else{
+    dat.here <- sel.bkb.raw[which(metadata.cell$Batch == para.df$Unwanted[w]), m]
+    }
     ## calibrated values
     calib.temp[[w]] <- calib(dat.here, med.alpha, med.mle.mean, sig.2 = med.mle.sd^2)
     }
-    #concatenating calib values for each well
+    #concatenating calib values for each "unwanted factor"
     calib.dat[,m] <- do.call(c, calib.temp)
     }
     saveRDS(calib.dat, file = file.path(paths["intermediary"], "medpara_bkc.bkb_no.bkcPhy_mt.rds"))

@@ -18,10 +18,13 @@ cluster.analysis(paths, bkb.v, yvar = "Legend", control.wells, plots = TRUE)
 \item{plots}{logical; if TRUE (default), produce an UMAP embedding plot from the normalised backbone markers and the imputed infinity markers to visualise the structure of the biological clusters.}
 }
 \value{
-Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset. Visualising the result with the scatter plots.
+Metadata for cells with group labels from the cluster analysis
 }
 \description{
 This function has been designed to perform cluster analysis for the normalised backbone measurements and the complete dataset which includes the normalised backbone measurements and the imputed well-specific markers.
+}
+\details{
+Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset, and visualising the result with the scatter plots in the output directory.
 }
 \author{
 Hsiao-Chi Liao

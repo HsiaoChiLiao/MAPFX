@@ -7,16 +7,19 @@
 bkc_bkb(
   paths,
   bkb.v,
+  MPC,
   bkb.upper.quantile = 0.9,
   bkb.lower.quantile = 0.1,
   bkb.min.quantile = 0.01,
-  plots
+  plots = TRUE
 )
 }
 \arguments{
 \item{paths}{a vector of characters of paths to store intput, intermediary results, outputs...}
 
 \item{bkb.v}{a vector of the names of the backbone markers (MUST match to the names in the FCS file).}
+
+\item{MPC}{if the data is from MPC experiments, set \code{MPC = TRUE}. Setting FALSE represents data from the fluorescence flow cytometry (FFC) assay.}
 
 \item{bkb.upper.quantile}{the cut-off (default = 0.9) for selecting cells used for estimating the parameter of signal.}
 
@@ -27,10 +30,13 @@ bkc_bkb(
 \item{plots}{logical; if TRUE (default), produce scatter plots for pre- and post- background adjusted backbone markers (calibrated values on y-axis and raw values on x-axis).}
 }
 \value{
-Generating the calibrated measurements and save to medpara_bkc.bkb_no.bkcPhy_mt.rds file. Visualising the result with the scatter plots.
+Background noise corrected backbone markers and graphs if specified
 }
 \description{
 This function has been designed to do background correction for the backbone markers by using normal-exponential convolution model.
+}
+\details{
+Generating the calibrated measurements and save to medpara_bkc.bkb_no.bkcPhy_mt.rds file, and visualising the result with the scatter plots in the output directory.
 }
 \author{
 Hsiao-Chi Liao and Agus Salim

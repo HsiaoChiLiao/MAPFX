@@ -36,7 +36,7 @@ For the protein intensities from FFC experiments, the function `MapfxFFC` is use
 ## Preparing Data for the Analysis - the Folder Diagram
 ```
 # FCSpath
-└───FCSpath/FCS
+└───FCSpath
 │   └───fcs
 │       │   Plate1_A01.fcs
 │       │   Plate1_A02.fcs
@@ -45,7 +45,7 @@ For the protein intensities from FFC experiments, the function `MapfxFFC` is use
 │       │   filename_meta.csv
 
 # Outpath
-└───Outpath/Output
+└───Outpath
 │   └───intermediary
 │   └───downstream
 │   └───graph
@@ -60,7 +60,7 @@ When set `file_meta = "auto"` for `MapfxMPC`, the file identifier keyword (GUID)
 Plate information: Plate1, Plate2, …, Plate9\
 Well information: A1, A2, …, A12, B1, …, H1, …, H12\
 
-When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/FCS/meta/`.\
+When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/meta/`.\
 An example:
 ```{r, metaformat1, echo = FALSE, results = 'asis'}
 library(knitr)
@@ -73,11 +73,11 @@ df <- data.frame(
     Well.lab = c("P1_A12", "P2_D08", "P3_G01"))
 kable(df)
 ```
-Note that the "Filenam" column refers to the GUID (file name) of each FCS file in the `FCSpath/FCS/fcs/`.
+Note that the "Filenam" column refers to the GUID (file name) of each FCS file in the `FCSpath/fcs/`.
 
 
 #### For FFC Experiments from Different Batches
-Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/FCS/meta/`.\
+Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/meta/`.\
 An example:
 ```{r, metaformat2, echo = FALSE, results = 'asis'}
 library(knitr)
@@ -150,12 +150,12 @@ dir.create(file.path(tempdir(), "MPC_impu_Output"))
 # usage
 # when impute = TRUE, randomly selecting 50% of the cells in each well for model training
 set.seed(123) 
-MapfxMPC(
+MapfxMPC_impu_obj <- MapfxMPC(
     runVignette = TRUE, #set FALSE if not running this Vignette
     runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
-    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(tempdir(), "MPC_impu_Output"), # or users specify their own path: "/Outpath/Output/",
+    FCSpath = NULL, # users specify their own input path
+    Outpath = file.path(tempdir(), "MPC_impu_Output"), # or users specify their own output path
     file_meta = "auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -189,7 +189,7 @@ MapfxMPC(
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in `file.path(tempdir(), "MPC_impu_Output")` (users can specify their own path: `/Outpath/Output/`).
+All the output will be stored in `file.path(tempdir(), "MPC_impu_Output")` (users can specify their own path: `/Outpath/`).
 
 ## `MapfxMPC(..., impute=FALSE)` - normalising data from MPC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (well effects), and cluster analysis using backbones only.
@@ -202,12 +202,12 @@ data(ord.fcs.raw.mt_mpc)
 dir.create(file.path(tempdir(), "MPC_NOimpu_Output"))
 
 # usage
-MapfxMPC(
+MapfxMPC_NOimpu_obj <- MapfxMPC(
     runVignette = TRUE, #set FALSE if not running this Vignette
     runVignette_meta = ord.fcs.raw.meta.df.out_mpc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_mpc, #set NULL if not running this Vignette
-    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(tempdir(), "MPC_NOimpu_Output"), # or users specify their own path: "/Outpath/Output/",
+    FCSpath = NULL, # users specify their own input path
+    Outpath = file.path(tempdir(), "MPC_NOimpu_Output"), # or users specify their own output path
     file_meta="auto",
     bkb.v = c(
     "FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
@@ -235,7 +235,7 @@ MapfxMPC(
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in `file.path(tempdir(), "MPC_NOimpu_Output")` (users can specify their own path: `/Outpath/Output/`).
+All the output will be stored in `file.path(tempdir(), "MPC_NOimpu_Output")` (users can specify their own path: `/Outpath/`).
 
 ## `MapfxFFC` - normalising data from FFC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (batch effects), and cluster analysis.
@@ -244,16 +244,15 @@ For users who would like to perform the following steps: background correction, 
 data(ord.fcs.raw.meta.df.out_ffc)
 data(ord.fcs.raw.mt_ffc)
 
-# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxMPC function
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxFFC function
 dir.create(file.path(tempdir(), "FFCnorm_Output"))
 
-MapfxFFC(
+MapfxFFC_obj <- MapfxFFC(
     runVignette = TRUE, #set FALSE if not running this Vignette
     runVignette_meta = ord.fcs.raw.meta.df.out_ffc, #set NULL if not running this Vignette
     runVignette_rawInten = ord.fcs.raw.mt_ffc, #set NULL if not running this Vignette
-    FCSpath = NULL, # users specify their own path: "/FCSpath/FCS/",
-    Outpath = file.path(tempdir(), "FFCnorm_Output"), # or users specify their own path: "/Outpath/Output/",
-    file_meta = "usr",
+    FCSpath = NULL, # users specify their own input path
+    Outpath = file.path(tempdir(), "FFCnorm_Output"), # or users specify their own output path
     protein.v = c("CD3","CD4","CD8","CD45"),
     protein.upper.quantile = 0.9, 
     protein.lower.quantile = 0.1, 
@@ -267,7 +266,7 @@ MapfxFFC(
 help(MapfxFFC, package = "MAPFX")
 ```
 
-All the output will be stored in `file.path(tempdir(), "FFCnorm_Output")` (users can specify their own path: `/Outpath/Output/`).
+All the output will be stored in `file.path(tempdir(), "FFCnorm_Output")` (users can specify their own path: `/Outpath/`).
 
 
 ## Description of the output

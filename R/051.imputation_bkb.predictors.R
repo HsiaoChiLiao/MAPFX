@@ -6,7 +6,7 @@
 #' @param chans a vector of the names of the backbone markers (MUST match to the names in the FCS file).
 #' @param yvar the name of the well-specific marker in the FCS files (has been changed to "Legend" in the first function).
 #' @param cores the number of cores used to perform parallel computation (default = 8L).
-#' @param models.use a vector of the names of the models used for imputation (an example: c("LM", "LASSO3", "SVM", "XGBoost")). The length of the vector is arbitrary.
+#' @param models.use a vector of the names of the models used for imputation (an example: `c("LM", "LASSO3", "SVM", "XGBoost")`). The length of the vector is arbitrary.
 #' @param extra_args_regression_params a list of the lists of the parameters for running regression models.
 #' @param prediction_events_downsampling default = NULL (not doing subsampling). How many cells per well you want to have the imputation? (must be less than or equal to a half as we won't get the prediction for cells in the training set).
 #' @param impu.training logical; if FALSE (default), not impute the training set (the dataset used to train the imputation models).
@@ -30,7 +30,10 @@
 #' @importFrom graphics abline
 #' @importFrom methods is
 #'
-#' @return Imputing the unmeasured well-specific markers and save to predictions.Rds file. Visualising the result with the boxplots (r-sq).
+#' @return A list of imputations
+#' 
+#' @details
+#' This function returns the object of imputation of the unmeasured well-specific markers. In the output directory, the imputations are saved to predictions.Rds file. Visualisation of the imputation accuracy will be provided if specified.
 #'
 imputation_bkb.predictors <-
 function(
@@ -674,5 +677,6 @@ function(
     }
     }
     }
+    return(preds)
     }
     

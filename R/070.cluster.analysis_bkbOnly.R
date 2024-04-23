@@ -20,7 +20,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset. Visualising the result with the scatter plots.
+#' @return Metadata for cells with group labels from the cluster analysis
+#' 
+#' @details
+#' Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the biological clusters from the clean and complete dataset, and visualising the result with the scatter plots in the output directory.
 #' 
 cluster.analysis.bkbOnly <-
 function(
@@ -40,28 +43,22 @@ function(
     message("Clustering with normalised backbones")
     bkb.dat <- normalised.bkb[,match(bkb.v,colnames(normalised.bkb)),drop=FALSE]
     message("Running UMAP...")
-    a <- Sys.time()
     umap.bkb <- umap(bkb.dat, n_neighbors = 15, min_dist = 0.2, metric = "euclidean", n_epochs = 2000)
-    b <- Sys.time()
-    b-a #12.46998 mins
     saveRDS(umap.bkb, file = file.path(paths["downstream"], paste0("ClusterAnalysis_", "umap_",length(bkb.v),"bkb.rds")))
     
     message("Running Phenograph...")
-    a <- Sys.time()
     phenog.bkb <- Rphenograph(bkb.dat, k = 50)  #knn_fun = "hnsw", 
-    b <- Sys.time()
-    b-a #5.802254 mins
     saveRDS(phenog.bkb, file = file.path(paths["intermediary"], paste0("ClusterAnalysis_", "phenog_",length(bkb.v),"bkb.rds")))
     
     ##
-    metadata.cell[,paste0("GP.denoised.bkb")] <- as.factor(membership(phenog.bkb[[2]]))
+    metadata.cell[,paste0("GP.denoised.bkb.allCells")] <- as.factor(membership(phenog.bkb[[2]]))
     
     if(plots == TRUE){
     message("\tVisualising clusters...")
     {
     ## bkb
     {
-    graph.dat <- data.frame(umap.bkb, metadata.cell[paste0("GP.denoised.bkb")])
+    graph.dat <- data.frame(umap.bkb, metadata.cell[paste0("GP.denoised.bkb.allCells")])
     colnames(graph.dat) <- c("UMAP1", "UMAP2", "Cluster")
     
     n <- length(unique(graph.dat[,3]))
@@ -82,8 +79,9 @@ function(
     }
     
     ###
-    head(metadata.cell)
     saveRDS(metadata.cell, file = file.path(paths["downstream"], "fcs_metadata_df.rds"))
     
     message("\tCompleted!")
+    
+    return(metadata.cell)
     }

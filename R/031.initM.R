@@ -24,7 +24,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the initial biological clusters. Visualising the result with the scatter plots.
+#' @return Metadata for cells with the initial biological clusters labels added
+#' 
+#' @details
+#' Updating the metadata for cells in the fcs_metadata_df.rds file, adding the information of the initial biological clusters, and visualising the result with the scatter plots in the output directory.
 #' 
 initM <-
 function(
@@ -80,7 +83,6 @@ function(
     for(chan in chans){
     sel.bkb.lgc[,chan] <- transforms_chan[[chan]](xp[,chan])
     }
-    head(sel.bkb.lgc)
     }
     
     message("\tCentring logicle transformed intensities...")
@@ -156,7 +158,7 @@ function(
     qual_col_pals <- brewer.pal.info[brewer.pal.info$category == 'qual',,drop=FALSE]
     col.coeff <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))[seq_len(n)]
     
-    jpeg(filename = file.path(paths["graph"], "/", paste0(trans.dat, "_UMAP_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)
+    jpeg(filename = file.path(paths["graph"], paste0(trans.dat, "_UMAP_colPhenog_600x750.jpeg")), height = 600, width = 750, res = 80)
     p <- ggplot(
     data=graph.dat, mapping = aes(x=UMAP1, y=UMAP2, colour=Pheno.gp)) + geom_point(size = 0.05, alpha = 0.25) + 
     labs(titles = paste0("Initial biology (M matrix) from ", trans.dat," bkb. \n(", nrow(graph.dat)," cells)")) +
@@ -166,4 +168,5 @@ function(
     dev.off()
     }
     message("\tCompleted!")
+    return(metadata.cell)
     }

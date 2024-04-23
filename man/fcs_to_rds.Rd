@@ -14,10 +14,13 @@ fcs_to_rds(paths, file_meta, yvar)
 \item{yvar}{the name of the well-specific marker in the FCS files (e.g., "Legend").}
 }
 \value{
-Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files.
+Raw protein intensities and the corresponding metadata from MPC experiments
 }
 \description{
 This function has been designed to convert the raw FCS files to data matrix and export to RDS files.
+}
+\details{
+Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files in the output directory.
 }
 \author{
 Hsiao-Chi Liao

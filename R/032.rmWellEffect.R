@@ -19,7 +19,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Generating the calibrated measurements and save to bkc.adj.bkb_logScale_mt.rds (on log scale) and bkc.adj.bkb_linearScale_mt.rds (on linear scale). Visualising the result with the heatmaps.
+#' @return Normalised backbone markers on log scale
+#' 
+#' @details
+#' Generating the calibrated measurements and saving to bkc.adj.bkb_logScale_mt.rds (on log scale) and bkc.adj.bkb_linearScale_mt.rds (on linear scale), and visualising the result with the heatmaps in the output directory.
 #' 
 rmWellEffect <-
 function(
@@ -32,7 +35,6 @@ function(
     ### Rfast to estimate coef for later adj. ###
     {
     message("\tEstimating coefficients for removing well effect (Rfast - pre.adj)...")
-    a <- Sys.time()
     {
     metadata.cell[,c("Plate","Column","Row","init.M")] <- lapply(metadata.cell[,c("Plate","Column","Row","init.M")], factor)
     contrasts(metadata.cell[,"Plate"]) <- contr.sum(3, contrasts=TRUE)
@@ -66,15 +68,12 @@ function(
     save(lm.results.ls, quant.bio.pcr.mt, file = file.path(paths["intermediary"], "rmWellEffect_log.normal.reg_coef.mdl_pre.RData"))
     save(res.df, file = file.path(paths["intermediary"], "rmWellEffect_log.normal.reg_residuals.RData"))
     }
-    b <- Sys.time()
-    b-a
     message("\tEstimation completed!")
     }
     ### adjusting data - subtracting unwanted effect ###
     {
     message("\tRemoving well effect for backbone markers...")
     adj.data <- log.adj.data <- bkc.bkb
-    a <- Sys.time()
     for(i in seq_along(bkc.bkb[1,])){
     unwanted.eff <- (xx[,(2:21)] %*% quant.bio.pcr.mt[(2:21), i])
     
@@ -82,8 +81,6 @@ function(
     
     adj.data[,i] <- (exp(log.adj.data[,i])-0.000001)
     }
-    b <- Sys.time()
-    b-a
     saveRDS(log.adj.data, file = file.path(paths["downstream"], "bkc.adj.bkb_logScale_mt.rds"))
     saveRDS(adj.data, file = file.path(paths["downstream"], "bkc.adj.bkb_linearScale_mt.rds"))
     message("\tAdjustment completed!")
@@ -91,7 +88,6 @@ function(
     ### Rfast to estimate coef for later adj. ###
     {
     message("\tExamining the existence of well effect in the adjusted data (Rfast - post.adj)...")
-    a <- Sys.time()
     {
     metadata.cell[,c("Plate","Column","Row","init.M")] <- lapply(metadata.cell[,c("Plate","Column","Row","init.M")], factor)
     contrasts(metadata.cell[,"Plate"]) <- contr.sum(3, contrasts=TRUE)
@@ -121,8 +117,6 @@ function(
     adj.quant.bio.pcr.mt <- rbind(adj.quant.bio.pcr.mt, ln.sig = ln.sig.v)
     save(lm.results.ls, quant.bio.pcr.mt, adj.quant.bio.pcr.mt, file = file.path(paths["intermediary"], "rmWellEffect_log.normal.reg_coef.mdl_post.RData"))
     }
-    b <- Sys.time()
-    b-a
     }
     
     ### rmWellEffect_bkb_visualisation (heatmap) - bio and pcr effects ###
@@ -237,4 +231,6 @@ function(
     }
     }
     }
+    
+    return(log.adj.data)
     }

@@ -4,20 +4,22 @@
 \alias{MapfxFFC}
 \title{Normalising data from the Fluorescence Flow Cytometry (FFC) Experiments with mapfx.norm}
 \usage{
-MapfxFFC(runVignette = FALSE,
-         runVignette_meta = NULL,
-         runVignette_rawInten = NULL,
-         FCSpath,
-         Outpath,
-         file_meta="usr",
-         protein.v,
-         protein.upper.quantile = 0.9, 
-         protein.lower.quantile = 0.1, 
-         protein.min.quantile = 0.01,
-         plots.bkc.protein = TRUE,
-         plots.initM = TRUE,
-         plots.rmBatchEffect = TRUE,
-         cluster.analysis.protein = TRUE, plots.cluster.analysis.protein = TRUE)
+MapfxFFC(
+  runVignette = FALSE,
+  runVignette_meta = NULL,
+  runVignette_rawInten = NULL,
+  FCSpath = NULL,
+  Outpath = NULL,
+  protein.v = NULL,
+  protein.upper.quantile = 0.9,
+  protein.lower.quantile = 0.1,
+  protein.min.quantile = 0.01,
+  plots.bkc.protein = TRUE,
+  plots.initM = TRUE,
+  plots.rmBatchEffect = TRUE,
+  cluster.analysis.protein = TRUE,
+  plots.cluster.analysis.protein = TRUE
+)
 }
 \arguments{
 \item{runVignette}{logical; if FALSE (default), specify a path to \code{FCSpath} argument; TRUE for running Vignette using built-in data.}
@@ -29,8 +31,6 @@ MapfxFFC(runVignette = FALSE,
 \item{FCSpath}{path to the input directory where \code{filename_meta.csv} and FCS files are stored. \code{filename_meta.csv} should be saved under \verb{FCSpath/FCS/meta/} and FCS files should be saved under \verb{FCSpath/FCS/fcs/}. See Vignette for details.}
 
 \item{Outpath}{path to the output directory where intermediate results and final results will be stored.}
-
-\item{file_meta}{if the file names of the FCS files are in the specified format, set \code{file_meta = "auto"}; otherwise set \code{file_meta = "usr"} and provide a \code{filename_meta.csv} file in \verb{FCSpath/FCS/meta/}.}
 
 \item{protein.v}{a vector of the names of the protein markers (MUST be the same as the names in the FCS files). For example, \code{protein.v = c("FSC-H","FSC-W","SSC-H","SSC-W","CD3","CD4","CD8","CD45")}.}
 
@@ -51,13 +51,37 @@ MapfxFFC(runVignette = FALSE,
 \item{plots.cluster.analysis.protein}{logical; if TRUE (default), produce an UMAP embedding plot from the normalised protein markers to visualise the structure of the biological clusters.}
 }
 \value{
-Normalised protein and infinity measurements for the MPC data; normalised protein measurements for the FFC data. Cluster analysis for normalised proteins. Graphs will be provided if specified.
+Normalised protein markers on log scale and metadata for cells
 }
 \description{
 This function is used to normalise, including background correction and removal of batch effects, protein intensity data from FFC assays. The input data is in FCS format. The functions include data normalisation and cluster analysis.
 }
+\details{
+In the output directory, this function produces the normalised protein measurements, cell group labels from the cluster analysis using normalised proteins, and graphs will be provided if specified.
+}
 \examples{
-MapfxFFC()
+# import built-in data
+data(ord.fcs.raw.meta.df.out_ffc)
+data(ord.fcs.raw.mt_ffc)
+
+# create an Output directory in the current working directory for the argument 'Outpath' of the MapfxFFC function
+dir.create(file.path(tempdir(), "FFCnorm_Output"))
+
+MapfxFFC_obj <- MapfxFFC(
+  runVignette = TRUE, #set FALSE if not running this example
+  runVignette_meta = ord.fcs.raw.meta.df.out_ffc, #set NULL if not running this example
+  runVignette_rawInten = ord.fcs.raw.mt_ffc, #set NULL if not running this example
+  FCSpath = NULL, # users specify their own input path if not running this example
+  Outpath = file.path(tempdir(), "FFCnorm_Output"),
+  protein.v = c("CD3","CD4","CD8","CD45"),
+  protein.upper.quantile = 0.9, 
+  protein.lower.quantile = 0.1, 
+  protein.min.quantile = 0.01,
+  plots.bkc.protein = TRUE,
+  plots.initM = TRUE,
+  plots.rmBatchEffect = TRUE,
+  cluster.analysis.protein = TRUE, plots.cluster.analysis.protein = TRUE)
+  
 
 }
 \author{

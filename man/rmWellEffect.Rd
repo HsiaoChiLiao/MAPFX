@@ -12,10 +12,13 @@ rmWellEffect(paths, plots = TRUE)
 \item{plots}{logical; if TRUE (default), produce heatmaps to visualise the unwanted (well) effects and biological effects in the pre- and post- adjusted datasets.}
 }
 \value{
-Generating the calibrated measurements and save to bkc.adj.bkb_logScale_mt.rds (on log scale) and bkc.adj.bkb_linearScale_mt.rds (on linear scale). Visualising the result with the heatmaps.
+Normalised backbone markers on log scale
 }
 \description{
 This function has been designed to remove the unwanted effects (well effects) from the background corrected measurements.
+}
+\details{
+Generating the calibrated measurements and saving to bkc.adj.bkb_logScale_mt.rds (on log scale) and bkc.adj.bkb_linearScale_mt.rds (on linear scale), and visualising the result with the heatmaps in the output directory.
 }
 \author{
 Hsiao-Chi Liao

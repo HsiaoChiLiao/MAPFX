@@ -12,7 +12,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #' 
-#' @return Generating the combined data and save to impu.input_log.mt.rds (on log scale).
+#' @return Combined normalised backbone and infinity markers for imputation
+#' 
+#' @details
+#' Generating the combined data and saving to impu.input_log.mt.rds (on log scale) in the output directory.
 #' 
 mkImputeMT <-
 function(

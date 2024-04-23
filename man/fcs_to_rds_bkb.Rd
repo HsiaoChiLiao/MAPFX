@@ -14,10 +14,13 @@ fcs_to_rds_bkb(paths, file_meta, MPC)
 \item{MPC}{if the data is from MPC experiments, set MPC = TRUE. Setting FALSE represents data from the fluorescence flow cytometry (FFC) assay.}
 }
 \value{
-Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files.
+Raw protein intensities and the corresponding metadata from FFC experiments
 }
 \description{
 This function has been designed to convert the raw FCS files to data matrix and export to RDS files.
+}
+\details{
+Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files in the output directory.
 }
 \author{
 Hsiao-Chi Liao

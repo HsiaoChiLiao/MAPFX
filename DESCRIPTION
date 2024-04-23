@@ -2,7 +2,7 @@ Package: MAPFX
 Title: MAssively Parallel Flow cytometry Xplorer (MAPFX): A Toolbox for
         Analysing Data from the Massively-Parallel Cytometry
         Experiments
-Version: 0.99.2
+Version: 0.99.3
 Authors@R:
 	c(person("Hsiao-Chi", "Liao", email = "chelsea.acad@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9586-1246")),
 	  person("Agus", "Salim", role = c("ctb")), person("infinityFlow", role = c("ctb")))
@@ -17,7 +17,7 @@ Imports: flowCore, Biobase, stringr, uwot, iCellR, igraph,
         ggplot2, RColorBrewer, Rfast, ComplexHeatmap,
         circlize, glmnetUtils, e1071, xgboost,
         parallel, pbapply, reshape2, gtools, utils, stats, cowplot, methods, grDevices, graphics
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 NeedsCompilation: no
 URL: https://github.com/HsiaoChiLiao/MAPFX

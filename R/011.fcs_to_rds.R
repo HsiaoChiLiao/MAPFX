@@ -18,7 +18,10 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv
 #'
-#' @return Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files.
+#' @return Raw protein intensities and the corresponding metadata from MPC experiments
+#'
+#' @details
+#' Generating fcs_metadata_df.rds and fcs_rawInten_mt.rds files in the output directory.
 #'
 fcs_to_rds <-
 function(
@@ -56,11 +59,11 @@ function(
     #well
     fcs.raw.meta.df$Well <- str_extract(fcs.raw.meta.df$Filenam, "[A-H]\\d{1,2}") #[:digit:], or the shorthand \\d
     orig.lab <- c(
-    paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), c(seq_len(9))),
+    paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), seq_len(9)),
     paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), c(10:12)))
     
     new.lab <- c(
-    paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), 0, c(seq_len(9))),
+    paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), 0, seq_len(9)),
     paste0(rep(c("A","B","C","D","E","F","G","H"), each = 9), c(10:12)))
     map <- setNames(new.lab, orig.lab)
     fcs.raw.meta.df$Well <- map[fcs.raw.meta.df$Well]
@@ -80,7 +83,7 @@ function(
     
     if(sum(is.na(fcs.raw.meta.df)) != 0){
     message("\tfile_meta='auto' doesn't work on your data.")
-    stop("\tPlease provide a 'filename_meta.csv' file and use file_meta='usr' instead.")
+    stop("\tPlease provide a \"filename_meta.csv\" file in `FCSpath/meta/` and use `file_meta=\"usr\"` instead.")
     }
     
     #ordering before giving NO.in.all
@@ -89,7 +92,7 @@ function(
     }
     
     if(file_meta == "usr"){
-    meta.inf <- read.csv(file = file.path(paths["input"], "/meta/filename_meta.csv"))
+    meta.inf <- read.csv(file = file.path(paths["input"], "meta", "filename_meta.csv"))
     for(i in seq_along(fs)){
     fcs.raw.mt.list[[i]] <- exprs(fs[[i]]) #22 columns
     filenam <- unlist(keyword(fs[[i]], "GUID"))
@@ -124,6 +127,6 @@ function(
     
     #out rds
     ord.fcs.raw.meta.df.out <- ord.fcs.raw.meta.df[,c(8,1,3,5,6,4,7),drop=FALSE]
-    saveRDS(ord.fcs.raw.meta.df.out, file = file.path(paths["intermediary"], "/fcs_metadata_df.rds"))
-    saveRDS(ord.fcs.raw.mt, file = file.path(paths["intermediary"], "/fcs_rawInten_mt.rds"))
+    saveRDS(ord.fcs.raw.meta.df.out, file = file.path(paths["intermediary"], "fcs_metadata_df.rds"))
+    saveRDS(ord.fcs.raw.mt, file = file.path(paths["intermediary"], "fcs_rawInten_mt.rds"))
     }

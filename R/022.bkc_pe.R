@@ -15,14 +15,17 @@
 #' @importFrom stats as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames
 #' @importFrom utils head read.csv write.csv
 #' 
-#' @return Generating the calibrated measurements and save to bkc.pe_mt.rds file. Visualising the result with the scatter plots.
+#' @return Background noise corrected infinity markers and graphs if specified
+#' 
+#' @details
+#' Generating the calibrated measurements and save to bkc.pe_mt.rds file, and visualising the result with the scatter plots in the output directory.
 #' 
 bkc_pe <-
 function(
     paths,
     pe.lower.quantile=0.1, #cells used for estimating parameters of noise
     pe.min.quantile=0.01, #the lowest 1% of values will not be used to minimize the impact of outliers on sig
-    plots
+    plots=TRUE
     ){
     ## for later use!
     min.quantile <- pe.min.quantile
@@ -71,7 +74,7 @@ function(
     samp.alpha <- c()
     criteria.alpha <- c()
     few.cell.well.ls <- list()
-    for(i in seq_along(para.df[,1])){ 
+    for(i in seq_along(para.df[,1])){
     well.here <- para.df$Well.lab[i]
     dat.here <- as.matrix(pe.raw[which(metadata.cell$Well.lab == well.here),1])
     
@@ -158,4 +161,6 @@ function(
     }
     }
     message("\tCalibration of infinity markers... Completed!")
+    
+    return(calib.dat)
     }

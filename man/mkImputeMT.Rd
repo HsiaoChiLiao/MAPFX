@@ -10,10 +10,13 @@ mkImputeMT(paths)
 \item{paths}{a vector of characters of paths to store intput, intermediary results, outputs...}
 }
 \value{
-Generating the combined data and save to impu.input_log.mt.rds (on log scale).
+Combined normalised backbone and infinity markers for imputation
 }
 \description{
 This function has been designed to combine the normalised backbone measurements and the normalised PE markers for later imputation.
+}
+\details{
+Generating the combined data and saving to impu.input_log.mt.rds (on log scale) in the output directory.
 }
 \author{
 Hsiao-Chi Liao

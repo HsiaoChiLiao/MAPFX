@@ -25,7 +25,7 @@ imputation_bkb.predictors(
 
 \item{cores}{the number of cores used to perform parallel computation (default = 8L).}
 
-\item{models.use}{a vector of the names of the models used for imputation (an example: c("LM", "LASSO3", "SVM", "XGBoost")). The length of the vector is arbitrary.}
+\item{models.use}{a vector of the names of the models used for imputation (an example: \code{c("LM", "LASSO3", "SVM", "XGBoost")}). The length of the vector is arbitrary.}
 
 \item{extra_args_regression_params}{a list of the lists of the parameters for running regression models.}
 
@@ -36,10 +36,13 @@ imputation_bkb.predictors(
 \item{plots}{logical; if TRUE (default), visualise the distribution of R-sq from each infinity marker.}
 }
 \value{
-Imputing the unmeasured well-specific markers and save to predictions.Rds file. Visualising the result with the boxplots (r-sq).
+A list of imputations
 }
 \description{
 This function has been designed to impute/predict the unmeasured well-specific markers with regression models.
+}
+\details{
+This function returns the object of imputation of the unmeasured well-specific markers. In the output directory, the imputations are saved to predictions.Rds file. Visualisation of the imputation accuracy will be provided if specified.
 }
 \author{
 Hsiao-Chi Liao and InfinityFlow (Becht et. al, 2021)

@@ -4,6 +4,9 @@
 <br>
 
 # Introduction
+## Motivation
+Massively-Parallel Cytometry (MPC) experiments allow cost-effective quantification of more than 200 surface proteins at single-cell resolution. [The Inflow protocol] (https://www.science.org/doi/10.1126/sciadv.abg0505) is the pioneer of the pipeline for analysing MPC data, and the Bioconductor's `infinityFlow` package was developed for comprehensive analyses. However, the methods for background correction and removal of unwanted variation implemented in the package can be improved. We develop the `MAPFX` package as an alternative that has a more thoughtful strategy to clean up the raw protein intensities. Unique features of our package compared to the `infinityFlow` pipeline include performing background correction prior to imputation and removing unwanted variation from the data at the cell-level, while explicitly accounting for the potential association between biology and unwanted factors. We benchmarked our pipeline against the `infinityFlow` pipeline and demonstrated that our approach is better at preserving biological signals, removing unwanted variation, and imputing unmeasured infinity markers [MAPFX pipeline](https://doi.org/10.1101/2024.02.28.582452). Two user friendly functions `MapfxMPC` and `MapfxFFC` are included in the `MAPFX` package that were designed for data from either MPC or FFC experiments (see below sections for details). 
+
 ## Analysing Data from MPC Experiments
 This package implemented an end-to-end toolbox for analysing raw data from MPC experiments. More details on the methodology can be found in [the MAPFX paper](https://doi.org/10.1101/2024.02.28.582452). The `MapfxMPC` function is designed for running through the whole pipeline. The pipeline starts by performing background correction on raw intensities to remove the noise from electronic baseline restoration and fluorescence compensation by adapting a normal-exponential convolution model. Unwanted technical variation, from sources such as well effects, is then removed using a log-normal model with plate, column, and row factors, after which infinity markers are imputed using the informative backbone markers as predictors with machine learning models. Cluster analysis and visualisation with UMAP two-dimensional representations can then be carried out if desired. Users can set `MapfxMPC(..., impute=FALSE)` if the imputation is not needed. 
 
@@ -13,7 +16,7 @@ For the protein intensities from FFC experiments, the function `MapfxFFC` is use
 ## Preparing Data for the Analysis - the Folder Diagram
 ```
 # FCSpath
-└───FCSpath/FCS
+└───FCSpath
 │   └───fcs
 │       │   Plate1_A01.fcs
 │       │   Plate1_A02.fcs
@@ -22,7 +25,7 @@ For the protein intensities from FFC experiments, the function `MapfxFFC` is use
 │       │   filename_meta.csv
 
 # Outpath
-└───Outpath/Output
+└───Outpath
 │   └───intermediary
 │   └───downstream
 │   └───graph
@@ -37,7 +40,7 @@ When set `file_meta = "auto"` for `MapfxMPC`, the file identifier keyword (GUID)
 Plate information: Plate1, Plate2, …, Plate9<br>
 Well information: A1, A2, …, A12, B1, …, H1, …, H12<br>
 
-When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/FCS/meta/`.<br>
+When set `file_meta = "usr"`, prepare `filename_meta.csv` in the following format and save the CSV file under `FCSpath/meta/`.<br>
 An example:<br>
 |  Filenam  |  Plate  |  Well  |  Column  |  Row  |  Well.lab  |
 |:---------:|:-------:|:------:|:--------:|:-----:|:----------:|
@@ -45,11 +48,11 @@ An example:<br>
 |p2_d08.fcs |  Plate2 |   D08  |  Col.08  | Row.04|   P2_D08   |
 |p3_g1.fcs  |  Plate3 |   G01  |  Col.01  | Row.07|   P3_G01   |
 <br>
-Note that the "Filenam" column refers to the GUID (file name) of each FCS file in the `FCSpath/FCS/fcs/`.
+Note that the "Filenam" column refers to the GUID (file name) of each FCS file in the `FCSpath/fcs/`.
 <br>
 
 #### For FFC Experiments from Different Batches
-Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/FCS/meta/`.<br>
+Prepare `filename_meta.csv` in the following format and save the CSV file in `FCSpath/meta/`.<br>
 An example:
 |  Filenam  |  Batch  |
 |:---------:|:-------:|
@@ -121,8 +124,8 @@ set.seed(123)
 MapfxMPC(runVignette = FALSE,
          runVignette_meta = NULL,
          runVignette_rawInten = NULL,
-         FCSpath = "/FCSpath/FCS/",
-         Outpath = "/Outpath/Output/",
+         FCSpath = "/FCSpath/",
+         Outpath = "/Outpath/",
          file_meta = "auto",
          bkb.v = c("FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
                    "CD4", "CD44", "CD8", "CD11c", "CD11b", "F480", 
@@ -154,7 +157,7 @@ MapfxMPC(runVignette = FALSE,
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in the `/Outpath/`.
 
 ## `MapfxMPC(..., impute=FALSE)` - normalising data from MPC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (well effects), and cluster analysis using backbones only.
@@ -163,8 +166,8 @@ For users who would like to perform the following steps: background correction, 
 MapfxMPC(runVignette = FALSE,
          runVignette_meta = NULL,
          runVignette_rawInten = NULL,
-         FCSpath="/FCSpath/FCS/",
-         Outpath="/Outpath/Output/",
+         FCSpath="/FCSpath/",
+         Outpath="/Outpath/",
          file_meta="auto",
          bkb.v = c("FSC-H", "FSC-W", "SSC-H", "SSC-W", "CD69-CD301b", "MHCII", 
                    "CD4", "CD44", "CD8", "CD11c", "CD11b", "F480", 
@@ -190,7 +193,7 @@ MapfxMPC(runVignette = FALSE,
 help(MapfxMPC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in the `/Outpath/`.
 
 ## `MapfxFFC` - normalising data from FFC experiments
 For users who would like to perform the following steps: background correction, removal of unwanted variation (batch effects), and cluster analysis.
@@ -201,8 +204,8 @@ MAPFX::MapfxFFC()
 MapfxFFC(runVignette = FALSE,
          runVignette_meta = NULL,
          runVignette_rawInten = NULL,
-         FCSpath = "/FCSpath/FCS/",
-         Outpath = "/Outpath/Output/",
+         FCSpath = "/FCSpath/",
+         Outpath = "/Outpath/",
          file_meta = "auto",
          protein.v = c("CD3","CD4","CD8","CD45"),
          protein.upper.quantile = 0.9, 
@@ -217,10 +220,10 @@ MapfxFFC(runVignette = FALSE,
 help(MapfxFFC, package = "MAPFX")
 ```
 
-All the output will be stored in the `/Outpath/Output/`.
+All the output will be stored in the `/Outpath/`.
 
 ## Description of the output
-Three folders will be automatically generated in `/Outpath/Output/`.<br>
+Three folders will be automatically generated in `/Outpath/`.<br>
 1. `intermediary`:<br>
 Intermediary results will be saved in the `.rds` and `.RData` formats and will be stored here.<br>
 2. `downstream`:<br>
