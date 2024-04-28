@@ -19,7 +19,7 @@
 #' @importFrom xgboost xgboost xgb.Booster.complete xgb.parameters<-
 #' @importFrom stats lm predict as.formula contr.sum contrasts<- dexp dnorm median model.matrix optim pexp pnorm quantile sd setNames formula
 #' @importFrom utils getS3method head read.csv
-#' @importFrom parallel makeCluster clusterExport clusterEvalQ stopCluster mc.reset.stream
+#' @importFrom parallel makeCluster clusterExport clusterEvalQ stopCluster
 #' @importFrom pbapply pblapply
 #' @import ggplot2
 #' @importFrom cowplot plot_grid
