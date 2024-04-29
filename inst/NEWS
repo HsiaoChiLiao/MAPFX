@@ -10,3 +10,7 @@ User Visible Changes:
 
     * Address reviewer's comments, including removing repetition and adding unit tests.
     * Run example with 2 cores.
+
+Changes in version 0.99.7 (2024-04-29), 0.99.8 (2024-04-29)
+
+    * Fixed issues on WinOS to pass
