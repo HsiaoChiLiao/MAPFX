@@ -2,15 +2,16 @@ Changes in version 0.99.0 (2024-03-18)
 
 User Visible Changes:
 
-    * Create the MAPFX package.
+    * Created the MAPFX package.
 
 Changes in version 0.99.1 (2024-03-18), 0.99.2 (2024-04-12), 0.99.3 (2024-04-22), 0.99.4 (2024-04-23), 0.99.5 (2024-04-23), and 0.99.6 (2024-04-23)
 
 User Visible Changes:
 
-    * Address reviewer's comments, including removing repetition and adding unit tests.
-    * Run example with 2 cores.
+    * Addressed reviewer's comments, including removing repetition and adding unit tests.
+    * Ran examples with 2 cores.
 
-Changes in version 0.99.7 (2024-04-29), 0.99.8 (2024-04-29)
+Changes in version 0.99.7 (2024-04-29), and 0.99.8 (2024-04-30)
 
-    * Fixed issues on WinOS to pass
+    * Fixed issues on WinOS to pass.
+    * Updated the README.md file.
